@@ -1,0 +1,38 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Un solo Worker sirve SSR, Server Actions, API Routes y los assets estáticos
+  // (Workers Static Assets). worker.ts envuelve lo que genera `npm run build:cf`.
+  "main": "worker.ts",
+  "name": "urban-styles",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      // Auto-referencia que OpenNext usa para revalidaciones internas.
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "urban-styles"
+    }
+  ],
+  // Keep-alive: evita que Supabase Free pause el proyecto por inactividad.
+  // El handler `scheduled` está en worker.ts y llama /api/health.
+  "triggers": {
+    "crons": ["0 */12 * * *"]
+  },
+  "observability": {
+    "enabled": true
+  },
+  // Variables públicas (no secretas). Los secretos se cargan con
+  // `npx wrangler secret put NOMBRE` — ver README › Despliegue.
+  "vars": {
+    "DEFAULT_SHOP_SLUG": "urban-styles",
+    "NEXT_PUBLIC_SUPABASE_URL": "https://tctaixiltsnofgnukpcj.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_UHNRTEAqDMBLKja6NBVNBw_czSf3QD2",
+    "NEXT_PUBLIC_SITE_URL": "https://urban-styles.urban-styles.workers.dev",
+    "NEXT_PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAAFZDFH6wlaCB3BYM",
+    "EMAIL_FROM": "Urban Styles <onboarding@resend.dev>"
+  }
+}

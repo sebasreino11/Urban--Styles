@@ -1,0 +1,10 @@
+# Variables para `npm run preview` (runtime de Workers en local, vía wrangler).
+# Copia a .dev.vars. Mismos valores que .env.local; ver .env.example.
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+SUPABASE_SECRET_KEY=
+NEXT_PUBLIC_SITE_URL=http://localhost:8787
+RESEND_API_KEY=
+EMAIL_FROM="Urban Styles <onboarding@resend.dev>"
+TURNSTILE_SECRET_KEY=
+INTEGRATION_API_KEY=

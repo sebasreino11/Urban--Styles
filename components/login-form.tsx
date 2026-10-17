@@ -1,110 +1,62 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { authButton, authInput } from "@/components/auth-shell";
+import { createClient } from "@/lib/supabase/client";
+import { safeNext } from "@/lib/safe-redirect";
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<"div">) {
+export function LoginForm() {
+  const router = useRouter();
+  const params = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    params.get("error") === "sin-acceso" ? "Tu cuenta no tiene acceso activo a ninguna barbería. Habla con el administrador." : null,
+  );
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
 
-  const handleLogin = async (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const supabase = createClient();
     setIsLoading(true);
     setError(null);
-
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) throw error;
-      // Update this route to redirect to an authenticated route. The user already has an active session.
-      router.push("/protected");
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
-    } finally {
+    const { error } = await createClient().auth.signInWithPassword({ email, password });
+    if (error) {
+      setError(
+        error.message.includes("Invalid login credentials")
+          ? "Correo o contraseña incorrectos."
+          : "No pudimos iniciar sesión. Intenta de nuevo.",
+      );
       setIsLoading(false);
+      return;
     }
+    router.push(safeNext(params.get("next"), "/agenda"));
+    router.refresh();
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>
-            Enter your email below to login to your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <Link
-                    href="/auth/forgot-password"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </Link>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Login"}
-              </Button>
-            </div>
-            <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{" "}
-              <Link
-                href="/auth/sign-up"
-                className="underline underline-offset-4"
-              >
-                Sign up
-              </Link>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+    <form onSubmit={handleLogin} className="grid gap-4">
+      <label className="grid gap-1.5">
+        <span className="text-sm font-medium">Correo</span>
+        <input id="email" type="email" autoComplete="email" required className={authInput} value={email} onChange={(e) => setEmail(e.target.value)} />
+      </label>
+      <label className="grid gap-1.5">
+        <span className="flex items-center justify-between text-sm font-medium">
+          Contraseña
+          <Link href="/auth/forgot-password" className="font-normal text-muted-foreground underline-offset-4 hover:underline">
+            ¿La olvidaste?
+          </Link>
+        </span>
+        <input id="password" type="password" autoComplete="current-password" required className={authInput} value={password} onChange={(e) => setPassword(e.target.value)} />
+      </label>
+      {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+      <button type="submit" className={authButton} disabled={isLoading}>
+        {isLoading ? "Entrando" : "Entrar"}
+      </button>
+      <p className="text-sm text-muted-foreground">
+        Las cuentas las crea el administrador de la barbería.
+      </p>
+    </form>
   );
 }

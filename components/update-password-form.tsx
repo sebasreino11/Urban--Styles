@@ -1,80 +1,47 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { authButton, authInput } from "@/components/auth-shell";
+import { createClient } from "@/lib/supabase/client";
 
-export function UpdatePasswordForm({
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<"div">) {
+/** Se usa al aceptar una invitación y al recuperar la contraseña. */
+export function UpdatePasswordForm() {
+  const router = useRouter();
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
 
-  const handleForgotPassword = async (
-    e: React.SubmitEvent<HTMLFormElement>,
-  ) => {
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const supabase = createClient();
+    if (password.length < 8) return setError("Usa al menos 8 caracteres.");
     setIsLoading(true);
     setError(null);
-
-    try {
-      const { error } = await supabase.auth.updateUser({ password });
-      if (error) throw error;
-      // Update this route to redirect to an authenticated route. The user already has an active session.
-      router.push("/protected");
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
-    } finally {
+    const { error } = await createClient().auth.updateUser({ password });
+    if (error) {
       setIsLoading(false);
+      setError(
+        error.message.includes("session")
+          ? "El enlace expiró. Pide uno nuevo desde “¿La olvidaste?”."
+          : "No pudimos guardar la contraseña. Prueba con otra.",
+      );
+      return;
     }
+    router.push("/agenda");
+    router.refresh();
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Reset Your Password</CardTitle>
-          <CardDescription>
-            Please enter your new password below.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleForgotPassword}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="password">New password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="New password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Saving..." : "Save new password"}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+    <form onSubmit={submit} className="grid gap-4">
+      <label className="grid gap-1.5">
+        <span className="text-sm font-medium">Contraseña nueva</span>
+        <input type="password" autoComplete="new-password" required minLength={8} className={authInput} value={password} onChange={(e) => setPassword(e.target.value)} />
+        <span className="text-xs text-muted-foreground">Mínimo 8 caracteres.</span>
+      </label>
+      {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+      <button type="submit" className={authButton} disabled={isLoading}>
+        {isLoading ? "Guardando" : "Guardar y entrar"}
+      </button>
+    </form>
   );
 }

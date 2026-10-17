@@ -40,3 +40,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.claude/hallucinating-canary/
+
+# cloudflare / opennext
+.open-next/
+.wrangler/
+.dev.vars*
+!.dev.vars.example
+
+.claude/

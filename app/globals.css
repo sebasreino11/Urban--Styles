@@ -2,59 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Identidad "letrero esmaltado y baldosa de barbería":
+ *   porcelana #EEF0EB · verde botella #16392E · rojo poste #9B2335
+ *   grafito #1E2422 · salvia #5E6B64
+ * Los tokens siguen la convención de shadcn/ui (HSL sin hsl()).
+ */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-  }
-  .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --background: 90 11% 93%;
+    --foreground: 158 9% 13%;
+    --card: 80 23% 98%;
+    --card-foreground: 158 9% 13%;
+    --popover: 80 23% 98%;
+    --popover-foreground: 158 9% 13%;
+    --primary: 161 44% 15%;
+    --primary-foreground: 90 11% 93%;
+    --secondary: 96 12% 88%;
+    --secondary-foreground: 161 44% 15%;
+    --muted: 96 12% 89%;
+    --muted-foreground: 148 6% 37%;
+    --accent: 351 63% 37%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 4 76% 40%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 113 7% 80%;
+    --input: 113 7% 76%;
+    --ring: 161 44% 25%;
+    --success: 152 52% 30%;
+    --warning: 36 85% 40%;
+    --radius: 0.25rem;
   }
 }
 
@@ -62,7 +39,62 @@
   * {
     @apply border-border;
   }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "kern", "liga", "tnum";
+  }
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Franja de poste de barbero. Única animación ambiental del sitio. */
+  .barber-stripe {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      hsl(var(--accent)) 0 10px,
+      hsl(var(--card)) 10px 20px,
+      hsl(var(--primary)) 20px 30px,
+      hsl(var(--card)) 30px 40px
+    );
+    background-size: 56.57px 56.57px;
+    animation: stripe-move 2.4s linear infinite;
+  }
+  @keyframes stripe-move {
+    to {
+      background-position: 56.57px 0;
+    }
+  }
+
+  /* Borde perforado del tiquete de turno. */
+  .ticket-perforation {
+    background-image: radial-gradient(circle at 8px 50%, hsl(var(--background)) 5px, transparent 5.5px);
+    background-size: 16px 100%;
+    background-repeat: repeat-x;
+  }
+
+  /* Lista de precios con puntos guía, como el tablero de la barbería. */
+  .leader {
+    background-image: radial-gradient(circle, hsl(var(--muted-foreground) / 0.55) 1px, transparent 1.5px);
+    background-size: 7px 4px;
+    background-repeat: repeat-x;
+    background-position: 0 calc(100% - 0.35em);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barber-stripe {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
   }
 }

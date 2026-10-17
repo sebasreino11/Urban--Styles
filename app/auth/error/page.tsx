@@ -1,51 +1,18 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Suspense } from "react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { AuthShell } from "@/components/auth-shell";
 
-async function ErrorContent({
-  searchParams,
-}: {
-  searchParams: Promise<{ error: string }>;
-}) {
-  const params = await searchParams;
+export const metadata: Metadata = { title: "Enlace no válido" };
 
+export default function Page() {
   return (
-    <>
-      {params?.error ? (
-        <p className="text-sm text-muted-foreground">
-          Code error: {params.error}
-        </p>
-      ) : (
-        <p className="text-sm text-muted-foreground">
-          An unspecified error occurred.
-        </p>
-      )}
-    </>
-  );
-}
-
-export default function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{ error: string }>;
-}) {
-  return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm">
-        <div className="flex flex-col gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl">
-                Sorry, something went wrong.
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Suspense>
-                <ErrorContent searchParams={searchParams} />
-              </Suspense>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div>
+    <AuthShell title="Enlace no válido">
+      <p className="text-muted-foreground">
+        El enlace expiró o ya se usó. Los enlaces de invitación y de recuperación sirven una sola vez.
+      </p>
+      <Link href="/auth/forgot-password" className="mt-6 inline-block font-medium text-primary underline underline-offset-4">
+        Pedir un enlace nuevo
+      </Link>
+    </AuthShell>
   );
 }
