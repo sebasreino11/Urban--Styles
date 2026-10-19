@@ -50,6 +50,10 @@ export type ActionResult<T = undefined> =
 
 export function toActionError(e: unknown): Extract<ActionResult, { ok: false }> {
   if (e instanceof DomainError) return { ok: false, code: e.code, message: e.message };
+  if (e instanceof Error && e.name === "ZodError") {
+    console.error(e);
+    return { ok: false, code: "VALIDATION", message: ERROR_MESSAGES.VALIDATION };
+  }
   console.error(e);
   return { ok: false, code: "UNKNOWN", message: ERROR_MESSAGES.UNKNOWN };
 }

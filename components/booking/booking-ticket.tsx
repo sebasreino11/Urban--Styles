@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
-import { Check, Loader2 } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import {
   loadAvailableDays,
   loadAvailableSlots,
@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { Turnstile } from "./turnstile";
 
 const ANY = "any";
+const DAYS_PER_PAGE = 5;
 
 interface Props {
   services: Service[];
@@ -73,7 +74,10 @@ export function BookingTicket({ services, barbers, timezone, horizonDays, initia
       if (r.ok) {
         setDays(r.data);
         setDate((d) => (d && r.data.some((x) => x.day === d) ? d : (r.data[0]?.day ?? null)));
-      } else setNotice(r.message);
+      } else {
+        setDays([]);
+        setNotice(r.message);
+      }
     });
     return () => {
       cancelled = true;
@@ -260,7 +264,7 @@ function Step({
 }) {
   const open = active;
   return (
-    <fieldset className={cn("px-5 py-4", !last && "border-b border-border")} disabled={!open && !done}>
+    <fieldset className={cn("min-w-0 px-5 py-4",!last && "border-b border-border")} disabled={!open && !done}>
       <legend className="sr-only">{title}</legend>
       <div className="flex items-center gap-3">
         <span
@@ -318,12 +322,20 @@ function DayStrip({
 }: {
   days: { day: string; slotCount: number }[] | null; selected: string | null; onSelect: (d: string) => void; timezone: string;
 }) {
+  const [page, setPage] = useState(0);
   if (!days) return <div className="h-[68px] animate-pulse rounded-md bg-muted" />;
   if (days.length === 0) return null;
+  const pages = Math.ceil(days.length / DAYS_PER_PAGE);
+  const current = Math.min(page, pages - 1);
+  const visible = days.slice(current * DAYS_PER_PAGE, (current + 1) * DAYS_PER_PAGE);
+  const arrow = "flex h-[68px] w-8 shrink-0 items-center justify-center rounded-md border border-border transition-colors hover:border-primary/50 disabled:opacity-30 disabled:hover:border-border";
   return (
-    <div className="-mx-5 overflow-x-auto px-5 pb-1 [scrollbar-width:thin]">
-      <ul className="flex gap-1.5" role="radiogroup" aria-label="Día">
-        {days.map(({ day }) => {
+    <div className="flex items-center gap-1.5">
+      <button type="button" aria-label="Días anteriores" className={arrow} disabled={current === 0} onClick={() => setPage(current - 1)}>
+        <ChevronLeft className="size-4" aria-hidden />
+      </button>
+      <ul className="grid min-w-0 flex-1 grid-cols-5 gap-1.5" role="radiogroup" aria-label="Día">
+        {visible.map(({ day }) => {
           const iso = `${day}T17:00:00Z`; // mediodía local en América: evita saltos de fecha
           const isSel = selected === day;
           return (
@@ -334,7 +346,7 @@ function DayStrip({
                 aria-checked={isSel}
                 onClick={() => onSelect(day)}
                 className={cn(
-                  "flex h-[68px] w-14 flex-col items-center justify-center rounded-md border leading-tight transition-colors",
+                  "flex h-[68px] w-full flex-col items-center justify-center rounded-md border leading-tight transition-colors",
                   isSel ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary/50",
                 )}
               >
@@ -346,6 +358,9 @@ function DayStrip({
           );
         })}
       </ul>
+      <button type="button" aria-label="Días siguientes" className={arrow} disabled={current >= pages - 1} onClick={() => setPage(current + 1)}>
+        <ChevronRight className="size-4" aria-hidden />
+      </button>
     </div>
   );
 }

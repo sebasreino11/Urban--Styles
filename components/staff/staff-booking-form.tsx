@@ -43,7 +43,12 @@ export function StaffBookingForm({
     setSlots(null);
     setSlot(null);
     loadAvailableSlots(serviceId, barberId || null, date).then((r) => {
-      if (!cancelled) setSlots(r.ok ? r.data : []);
+      if (cancelled) return;
+      if (r.ok) setSlots(r.data);
+      else {
+        setSlots([]);
+        setMessage({ ok: false, text: r.message });
+      }
     });
     return () => {
       cancelled = true;

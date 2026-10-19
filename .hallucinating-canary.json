@@ -1,0 +1,10 @@
+{
+  "enabled": true,
+  "canaryCount": 3,
+  "canaryPrefix": "HC-",
+  "warningThreshold": 70,
+  "criticalThreshold": 40,
+  "reinjectOnCompact": true,
+  "instructionCheck": false,
+  "autoWireStatusline": true
+}

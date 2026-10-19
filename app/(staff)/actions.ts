@@ -123,7 +123,7 @@ export async function withdrawTimeOff(id: string) {
     const { data, error } = await supabase
       .from("time_off_requests")
       .delete()
-      .eq("id", z.uuid().parse(id))
+      .eq("id", z.guid().parse(id))
       .select("id");
     if (error) throw fromDbError(error);
     if (!data?.length) throw new DomainError("FORBIDDEN");
@@ -288,7 +288,7 @@ export async function saveBusinessHours(hours: z.input<typeof weeklyHoursSchema>
 export async function saveBarberSchedule(barberId: string, hours: z.input<typeof weeklyHoursSchema>) {
   return run(async () => {
     const ctx = await ctxOrThrow("admin");
-    await replaceWeekly(ctx.shop.id, weeklyHoursSchema.parse(hours), z.uuid().parse(barberId));
+    await replaceWeekly(ctx.shop.id, weeklyHoursSchema.parse(hours), z.guid().parse(barberId));
     revalidatePath(`/admin/barberos/${barberId}`);
   });
 }
@@ -398,8 +398,8 @@ export async function linkBarberAccount(barberId: string, membershipId: string) 
     const supabase = await createClient();
     const { error } = await supabase
       .from("barbers")
-      .update({ membership_id: z.uuid().parse(membershipId) })
-      .eq("id", z.uuid().parse(barberId));
+      .update({ membership_id: z.guid().parse(membershipId) })
+      .eq("id", z.guid().parse(barberId));
     if (error) throw fromDbError(error);
     revalidatePath("/admin/barberos", "layout");
   });

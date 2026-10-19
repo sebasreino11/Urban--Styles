@@ -2,7 +2,7 @@ import { z } from "zod";
 
 /** Esquemas de los formularios del portal de staff (barbero y admin). */
 
-const uuid = z.uuid();
+const uuid = z.guid();
 const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha inválida");
 const time = z.string().regex(/^\d{2}:\d{2}$/, "Hora inválida");
 const optionalText = (max: number) =>

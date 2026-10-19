@@ -6,7 +6,7 @@ import { z } from "zod";
  * La BD vuelve a validar todo; esto solo da mensajes claros al usuario.
  */
 
-const uuid = z.uuid({ message: "Identificador inválido" });
+const uuid = z.guid({ message: "Identificador inválido" });
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha inválida (YYYY-MM-DD)");
 
 export const slotsQuerySchema = z.object({
@@ -41,7 +41,7 @@ export const bookingInputSchema = z.object({
     .string()
     .trim()
     .max(30)
-    .optional()
+    .nullish()
     .transform((v) => (v ? v : null)),
 });
 
