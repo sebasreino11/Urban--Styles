@@ -438,10 +438,10 @@ npm run preview        # build de Workers + runtime real de Cloudflare en local 
 | `NEXT_PUBLIC_SUPABASE_URL` | URL del proyecto Supabase | Supabase › Project Settings › API | Pública |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Llave pública (`sb_publishable_…`), sujeta a RLS | Supabase › Project Settings › API Keys | Pública |
 | `SUPABASE_SECRET_KEY` | Llave secreta (`sb_secret_…`), **ignora RLS** | Supabase › Project Settings › API Keys | **Secreta** |
-| `NEXT_PUBLIC_SITE_URL` | URL pública, usada en enlaces de correos | Tu dominio o `*.workers.dev` | Pública |
+| `NEXT_PUBLIC_SITE_URL` | URL pública, usada en enlaces de correos | `https://dbarbershopurbanstyles.com` en producción | Pública |
 | `DEFAULT_SHOP_SLUG` | Barbería por defecto si el dominio no coincide con ninguna | `barbershops.slug` | Pública |
 | `RESEND_API_KEY` | API key de Resend | resend.com › API Keys | **Secreta** |
-| `EMAIL_FROM` | Remitente, p. ej. `Urban Styles <citas@urbanstyles.co>` | Dominio verificado en Resend | Pública |
+| `EMAIL_FROM` | Remitente, p. ej. `Urban Styles <reservas@dbarbershopurbanstyles.com>` | Dominio verificado en Resend | Pública |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Site key de Turnstile | Cloudflare › Turnstile | Pública |
 | `TURNSTILE_SECRET_KEY` | Secret key de Turnstile | Cloudflare › Turnstile | **Secreta** |
 | `INTEGRATION_API_KEY` | Habilita `POST /api/v1/bookings` (vacía = deshabilitado) | Genérala con `openssl rand -hex 32` | **Secreta** |
@@ -467,16 +467,30 @@ npx wrangler secret put INTEGRATION_API_KEY        # opcional
 # 3. Variables públicas: en wrangler.jsonc › vars (o en el dashboard)
 #    NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
 #    NEXT_PUBLIC_SITE_URL, NEXT_PUBLIC_TURNSTILE_SITE_KEY, EMAIL_FROM, DEFAULT_SHOP_SLUG
-#    Deben existir también en tu shell/.env.local al hacer build (se incrustan en el JS).
+#    Las NEXT_PUBLIC_* y EMAIL_FROM van también en .env.production.local (no se
+#    versiona): `next build` las incrusta en el JS y ese archivo tiene prioridad
+#    sobre .env.local, que sigue apuntando a localhost para desarrollo.
 
 # 4. Migraciones contra el proyecto de producción
-npx supabase link --project-ref <ref-prod> && npm run db:push
+npx supabase link --project-ref tctaixiltsnofgnukpcj && npm run db:push
 
 # 5. Build + deploy
 npm run deploy
 ```
 
-El Worker queda en `https://urban-styles.<tu-subdominio>.workers.dev` (`workers_dev: true` en `wrangler.jsonc`). Ajusta `NEXT_PUBLIC_SITE_URL` y las *Redirect URLs* de Supabase a esa URL.
+El Worker se publica en la cuenta fijada en `wrangler.jsonc › account_id` y responde solo en `https://dbarbershopurbanstyles.com` y `www` (`routes` con `custom_domain`, `workers_dev: false`). En Supabase › Authentication › URL Configuration, la *Site URL* es `https://dbarbershopurbanstyles.com` y la *Redirect URL* es `https://dbarbershopurbanstyles.com/**`.
+
+### Cuentas y accesos
+
+Todo está a nombre del **dueño de la barbería** (correo del negocio, con 2FA). El desarrollador entra como miembro invitado y su acceso se quita desde cada panel sin tocar el código.
+
+| Servicio | Qué contiene | Rol del desarrollador | Costo |
+|---|---|---|---|
+| Cloudflare (cuenta `799cc572…43a7`) | Dominio `dbarbershopurbanstyles.com` (Registrar), DNS, Worker `urban-styles`, Turnstile, cron | Administrator (Manage Account › Members) | Renovación anual del dominio. Workers Free; Paid USD 5/mes si crece. |
+| Supabase (org "Urban Styles", proyecto `tctaixiltsnofgnukpcj`) | BD, Auth, usuarios | Developer (Organization › Team) | Free. Pro USD 25/mes si se necesitan backups diarios o más capacidad. |
+| Resend (team del dueño) | Dominio verificado y API keys `worker` y `supabase-smtp` | Member | Free: 100 correos/día y 3.000/mes. |
+
+Para cambiar de desarrollador: invítalo con ese rol en los tres servicios, quita al anterior y rota `SUPABASE_SECRET_KEY`, `RESEND_API_KEY` y `INTEGRATION_API_KEY` (`npx wrangler secret put …`).
 
 **Checklist antes de mostrar la demo:**
 
@@ -493,15 +507,13 @@ El Worker queda en `https://urban-styles.<tu-subdominio>.workers.dev` (`workers_
 - `open-next.config.ts`: sin caché incremental (no hay ISR, así que no se necesita R2, que exige tarjeta).
 - `worker.ts`: envuelve el handler de OpenNext y añade el `scheduled()` de keep-alive.
 
-**Dominio propio** (después de la venta):
+**Dominio propio y salida a producción:**
 
-1. Compra el dominio y agrégalo como zona en Cloudflare.
-2. Workers & Pages › `urban-styles` › Settings › Domains & Routes › *Add Custom Domain* (`urbanstyles.co`).
-3. `update barbershops set custom_domain = 'urbanstyles.co' where slug = 'urban-styles';` Con esto el mismo despliegue puede servir varias barberías, cada una con su dominio.
-4. Actualiza `NEXT_PUBLIC_SITE_URL`, las *Redirect URLs* de Supabase y verifica el dominio en Resend para cambiar `EMAIL_FROM`.
-5. Pon `"workers_dev": false` en `wrangler.jsonc` para que deje de existir la URL de workers.dev.
-6. Configura SMTP propio en Supabase (Resend) y el largo mínimo de contraseña en 8.
-7. Reemplaza los datos ficticios del seed (teléfonos, dirección, Instagram, barberos demo) por los reales desde el panel admin, y borra las citas demo con `npm run seed-demo -- --remove`.
+1. Dominio comprado en Cloudflare Registrar, en la cuenta del dueño. Las `routes` de `wrangler.jsonc` crean los Custom Domains al hacer deploy.
+2. `update barbershops set custom_domain = 'dbarbershopurbanstyles.com' where slug = 'urban-styles';` Con esto el mismo despliegue puede servir varias barberías, cada una con su dominio.
+3. Resend: dominio verificado (DKIM, SPF y MX de `send.` con auto-configure de Cloudflare, más DMARC en `_dmarc`). `EMAIL_FROM = Urban Styles <reservas@dbarbershopurbanstyles.com>`.
+4. SMTP propio en Supabase: `smtp.resend.com:465`, usuario `resend`, contraseña = API key `supabase-smtp`. Largo mínimo de contraseña: 8.
+5. Reemplaza los datos ficticios del seed (teléfonos, dirección, Instagram, barberos demo) por los reales desde el panel admin, y borra las citas demo con `npm run seed-demo -- --remove`.
 
 **Límites del plan Free y plan B:** el Worker pesa ~1,8 MiB comprimido (límite 3 MiB) y el plan Free da 10 ms de CPU por request. Si el volumen o el CPU crecen, **Workers Paid cuesta USD 5/mes** (10 M requests, 30 s de CPU) y no requiere cambios de código.
 

@@ -5,6 +5,6 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 SUPABASE_SECRET_KEY=
 NEXT_PUBLIC_SITE_URL=http://localhost:8787
 RESEND_API_KEY=
-EMAIL_FROM="Urban Styles <onboarding@resend.dev>"
+EMAIL_FROM="Urban Styles <reservas@dbarbershopurbanstyles.com>"
 TURNSTILE_SECRET_KEY=
 INTEGRATION_API_KEY=
