@@ -258,6 +258,28 @@ describe("administración", () => {
     ).rejects.toThrow(/FORBIDDEN/);
   });
 
+  it("perfil de barbero: admin lo guarda atómicamente; un barbero no puede", async () => {
+    const save = (actor: string, services: string[]) =>
+      as(db, user(actor), (tx) =>
+        tx.query("select public.save_barber_profile($1, 'Camilo R.', null, null, true, $2)", [
+          CAMILO,
+          services,
+        ]),
+      );
+    const camiloServices = async () =>
+      (await db.query("select service_id from public.barber_services where barber_id = $1", [CAMILO])).rows;
+
+    await save(ownerUser, [SERVICE_CUT]);
+    expect(await camiloServices()).toEqual([{ service_id: SERVICE_CUT }]);
+
+    // Un servicio inexistente revierte todo: nombre y servicios quedan como estaban.
+    await expect(save(ownerUser, [SERVICE_CUT, "00000000-0000-4000-b000-0000000000ff"])).rejects.toThrow();
+    expect(await camiloServices()).toEqual([{ service_id: SERVICE_CUT }]);
+
+    await expect(save(camiloUser, [])).rejects.toThrow(/FORBIDDEN/);
+    expect(await camiloServices()).toHaveLength(1);
+  });
+
   it("insights solo para admin", async () => {
     const from = bogota(TUESDAY, "00:00");
     const to = bogota(nextWeekday(3), "00:00");

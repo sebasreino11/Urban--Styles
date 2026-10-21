@@ -6,9 +6,10 @@
   "name": "urban-styles",
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
-  // Desactiva la URL pública *.workers.dev en cada despliegue. Sin esto,
-  // `wrangler deploy` la vuelve a activar. Requiere dominio propio o ruta.
-  "workers_dev": false,
+  // La demo se sirve en *.workers.dev (coincide con NEXT_PUBLIC_SITE_URL).
+  // Al agregar el dominio propio, pasar a false: si no, `wrangler deploy`
+  // mantiene activa la URL de workers.dev junto al dominio.
+  "workers_dev": true,
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
@@ -21,7 +22,7 @@
     }
   ],
   // Keep-alive: evita que Supabase Free pause el proyecto por inactividad.
-  // El handler `scheduled` está en worker.ts y llama /api/health.
+  // El handler `scheduled` está en worker.ts y consulta la API REST de Supabase.
   "triggers": {
     "crons": ["0 */12 * * *"]
   },

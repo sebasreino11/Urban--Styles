@@ -79,12 +79,14 @@ describe("get_available_slots", () => {
   it("una cita ocupa su duración completa", async () => {
     await book(bogota(TUESDAY, "10:00"), CAMILO);
     const at = (await slots(TUESDAY, CAMILO)).map((x) => x.at);
-    // 09:30 (terminaría 10:15) y 10:00–10:30 chocan; 09:15 y 10:45 no.
-    expect(at).toContain(bogota(TUESDAY, "09:15"));
-    expect(at).not.toContain(bogota(TUESDAY, "09:30"));
+    // La cita bloquea 10:00–10:45 más 15 min de tiempo muerto (hasta 11:00), y
+    // cada slot candidato también arrastra sus 15 min: 09:15 (10:00 + 15) y
+    // 10:45 chocan; 09:00 y 11:00 no.
+    expect(at).toContain(bogota(TUESDAY, "09:00"));
+    expect(at).not.toContain(bogota(TUESDAY, "09:15"));
     expect(at).not.toContain(bogota(TUESDAY, "10:00"));
-    expect(at).not.toContain(bogota(TUESDAY, "10:30"));
-    expect(at).toContain(bogota(TUESDAY, "10:45"));
+    expect(at).not.toContain(bogota(TUESDAY, "10:45"));
+    expect(at).toContain(bogota(TUESDAY, "11:00"));
   });
 
   it("solo la indisponibilidad APROBADA bloquea la agenda", async () => {
@@ -103,7 +105,7 @@ describe("get_available_slots", () => {
 describe("get_available_days", () => {
   it("marca los días con disponibilidad y omite los de descanso", async () => {
     const from = nextWeekday(1); // lunes
-    const to = nextWeekday(0, 3); // domingo siguiente o posterior
+    const to = new Date(Date.parse(`${from}T00:00:00Z`) + 6 * 86_400_000).toISOString().slice(0, 10); // domingo de esa semana
     const days = await as(db, { role: "anon" }, async (tx) =>
       (
         await tx.query<{ day: string | Date }>(

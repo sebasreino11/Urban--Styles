@@ -8,6 +8,21 @@ const nextConfig: NextConfig = {
   // Sin optimizador de imágenes: en Cloudflare es un servicio de pago.
   images: { unoptimized: true },
   poweredByHeader: false,
+  // Headers básicos de seguridad. Referrer-Policy evita que el token de
+  // /cita/[token] se filtre a sitios externos (Maps, Instagram, WhatsApp).
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "Referrer-Policy", value: "same-origin" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

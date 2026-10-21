@@ -476,7 +476,16 @@ npx supabase link --project-ref <ref-prod> && npm run db:push
 npm run deploy
 ```
 
-El Worker queda en `https://urban-styles.<tu-subdominio>.workers.dev`. Ajusta `NEXT_PUBLIC_SITE_URL` y las *Redirect URLs* de Supabase a esa URL.
+El Worker queda en `https://urban-styles.<tu-subdominio>.workers.dev` (`workers_dev: true` en `wrangler.jsonc`). Ajusta `NEXT_PUBLIC_SITE_URL` y las *Redirect URLs* de Supabase a esa URL.
+
+**Checklist antes de mostrar la demo:**
+
+- [ ] Secretos cargados: `SUPABASE_SECRET_KEY` y `TURNSTILE_SECRET_KEY`. **Sin el secreto de Turnstile no hay protección anti-bots**: `lib/turnstile.ts` la omite.
+- [ ] Supabase Auth configurado (Site URL, Redirect URLs, plantillas con `token_hash`, registros desactivados). Ver [Configurar Supabase](#3-configurar-supabase-remoto).
+- [ ] `npm run db:seed` + `npm run create-owner`.
+- [ ] `npm run seed-demo`: 4 semanas de historial y 10 días de agenda con clientes ficticios (`@demo.example.com`), sin enviar correos. `-- --reset` recarga y `-- --remove` borra solo las citas demo (hazlo antes de entregar al cliente).
+- [ ] Con `EMAIL_FROM = onboarding@resend.dev`, Resend **solo envía al correo del dueño de la cuenta Resend**. Para probar el correo de confirmación, reserva con ese correo.
+- [ ] Recorrido completo: reservar → correo → cancelar por enlace → panel (estados, indisponibilidad, métricas).
 
 **Archivos de configuración:**
 
@@ -490,6 +499,9 @@ El Worker queda en `https://urban-styles.<tu-subdominio>.workers.dev`. Ajusta `N
 2. Workers & Pages › `urban-styles` › Settings › Domains & Routes › *Add Custom Domain* (`urbanstyles.co`).
 3. `update barbershops set custom_domain = 'urbanstyles.co' where slug = 'urban-styles';` Con esto el mismo despliegue puede servir varias barberías, cada una con su dominio.
 4. Actualiza `NEXT_PUBLIC_SITE_URL`, las *Redirect URLs* de Supabase y verifica el dominio en Resend para cambiar `EMAIL_FROM`.
+5. Pon `"workers_dev": false` en `wrangler.jsonc` para que deje de existir la URL de workers.dev.
+6. Configura SMTP propio en Supabase (Resend) y el largo mínimo de contraseña en 8.
+7. Reemplaza los datos ficticios del seed (teléfonos, dirección, Instagram, barberos demo) por los reales desde el panel admin, y borra las citas demo con `npm run seed-demo -- --remove`.
 
 **Límites del plan Free y plan B:** el Worker pesa ~1,8 MiB comprimido (límite 3 MiB) y el plan Free da 10 ms de CPU por request. Si el volumen o el CPU crecen, **Workers Paid cuesta USD 5/mes** (10 M requests, 30 s de CPU) y no requiere cambios de código.
 
@@ -552,7 +564,7 @@ Un horario de inicio es reservable para un barbero si **todas** estas condicione
 2. **El servicio completo cabe** antes del final de esa franja (un corte de 45 min en una franja que cierra a las 18:00 empieza como tarde a las 17:15).
 3. Los inicios se generan cada `slot_interval_min` (15 min por defecto) desde el comienzo de la franja.
 4. Respeta la **antelación mínima** (`min_notice_min`) y el **horizonte** (`booking_horizon_days`). No se ofrecen fechas pasadas.
-5. No se **solapa** con citas `pending` o `confirmed` del barbero. Se compara el intervalo `[inicio, inicio + duración)`, no solo la hora de inicio.
+5. No se **solapa** con citas `pending` o `confirmed` del barbero. Se compara el intervalo completo, no solo la hora de inicio, y cada cita lleva **15 min de tiempo muerto** al final: se compara `[inicio, fin + 15 min)` (función `appt_blocked_range`). La cita conserva su `ends_at` real.
 6. No se solapa con indisponibilidad **aprobada**. Las solicitudes pendientes o rechazadas no bloquean nada.
 7. El barbero está activo y realiza ese servicio.
 
@@ -566,9 +578,10 @@ Funciona en tres capas, y la última es infalible:
 2. **`book_appointment` revalida** el horario con la misma `get_available_slots`. Nunca confía en lo que envía el cliente.
 3. **Constraint de exclusión** en `appointments`:
    ```sql
-   exclude using gist (barber_id with =, tstzrange(starts_at, ends_at, '[)') with &&)
+   exclude using gist (barber_id with =, public.appt_blocked_range(starts_at, ends_at) with &&)
      where (status in ('pending','confirmed'))
    ```
+   `appt_blocked_range` incluye los 15 min de tiempo muerto, así que la BD también impide citas pegadas.
    Postgres rechaza (`23P01`) cualquier cita activa que se solape con otra del mismo barbero, aunque dos transacciones lleguen en el mismo milisegundo. Con "el primero disponible", la función atrapa el error y prueba al siguiente barbero libre (empezando por el que tiene menos citas ese día). Si no queda ninguno responde `SLOT_TAKEN`. Verificado con `npm run test:race`.
 
 ### Estados de una cita

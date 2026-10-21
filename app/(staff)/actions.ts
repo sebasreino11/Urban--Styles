@@ -223,9 +223,10 @@ export async function saveService(input: z.input<typeof serviceSchema>) {
         .eq("barbershop_id", ctx.shop.id)
         .eq("active", true);
       if (barbers?.length) {
-        await supabase.from("barber_services").insert(
+        const { error: linkError } = await supabase.from("barber_services").insert(
           barbers.map((b) => ({ barber_id: b.id, service_id: data.id, barbershop_id: ctx.shop.id })),
         );
+        if (linkError) throw fromDbError(linkError);
       }
     }
     revalidatePath("/admin/servicios");
@@ -295,23 +296,18 @@ export async function saveBarberSchedule(barberId: string, hours: z.input<typeof
 
 export async function saveBarberProfile(input: z.input<typeof barberProfileSchema>) {
   return run(async () => {
-    const ctx = await ctxOrThrow("admin");
+    await ctxOrThrow("admin");
     const v = barberProfileSchema.parse(input);
     const supabase = await createClient();
-    const { error } = await supabase
-      .from("barbers")
-      .update({ display_name: v.displayName, bio: v.bio, photo_url: v.photoUrl, active: v.active })
-      .eq("id", v.id);
+    const { error } = await supabase.rpc("save_barber_profile", {
+      p_barber: v.id,
+      p_display_name: v.displayName,
+      p_bio: v.bio,
+      p_photo_url: v.photoUrl,
+      p_active: v.active,
+      p_service_ids: v.serviceIds,
+    });
     if (error) throw fromDbError(error);
-
-    const { error: delError } = await supabase.from("barber_services").delete().eq("barber_id", v.id);
-    if (delError) throw fromDbError(delError);
-    if (v.serviceIds.length) {
-      const { error: insError } = await supabase.from("barber_services").insert(
-        v.serviceIds.map((service_id) => ({ barber_id: v.id, service_id, barbershop_id: ctx.shop.id })),
-      );
-      if (insError) throw fromDbError(insError);
-    }
     revalidatePath("/admin/barberos", "layout");
     revalidatePath("/");
   });
@@ -382,9 +378,10 @@ export async function inviteStaff(input: z.input<typeof inviteStaffSchema>) {
         .eq("barbershop_id", ctx.shop.id)
         .eq("active", true);
       if (services?.length) {
-        await supabase.from("barber_services").insert(
+        const { error: linkError } = await supabase.from("barber_services").insert(
           services.map((s) => ({ barber_id: barber.id, service_id: s.id, barbershop_id: ctx.shop.id })),
         );
+        if (linkError) throw fromDbError(linkError);
       }
     }
     revalidatePath("/admin/barberos");
