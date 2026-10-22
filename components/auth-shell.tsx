@@ -5,14 +5,14 @@ import { Logo } from "@/components/brand";
 export function AuthShell({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="flex min-h-svh flex-col">
-      <div className="barber-stripe h-1.5" aria-hidden />
       <div className="flex flex-1 items-center justify-center px-4 py-12">
-        <div className="w-full max-w-sm rounded-xl bg-card p-6 shadow-lift ring-1 ring-gold/30 sm:p-8">
+        <div className="w-full max-w-sm overflow-hidden rounded-xl bg-card p-6 shadow-lift ring-2 ring-gold sm:p-8">
+          <div className="barber-stripe -mx-6 -mt-6 mb-6 h-2 sm:-mx-8 sm:-mt-8" aria-hidden />
           <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">
             Volver a la página de reservas
           </Link>
           <Logo size={72} className="mt-6" />
-          <h1 className="mb-6 mt-4 font-display text-4xl font-bold leading-none text-primary">{title}</h1>
+          <h1 className="mb-6 mt-4 font-display text-5xl font-black uppercase leading-none text-primary">{title}</h1>
           {children}
         </div>
       </div>

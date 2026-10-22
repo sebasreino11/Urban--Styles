@@ -262,6 +262,47 @@ describe("reprogramación por token", () => {
     await expect(reschedule(a.cancel_token, bogota(TUESDAY, "15:00"))).rejects.toThrow(/NOT_RESCHEDULABLE/);
   });
 
+  it("solo deja reprogramar una vez; cancelar sigue disponible", async () => {
+    const r = await book(bogota(TUESDAY, "10:00"), CAMILO);
+    const byToken = async () =>
+      (
+        await as(db, { role: "service_role" }, (tx) =>
+          tx.query<{ r: { starts_at: string; can_reschedule: boolean; can_cancel: boolean; rescheduled_at: string | null } }>(
+            "select public.get_appointment_by_token($1) as r",
+            [r.cancel_token],
+          ),
+        )
+      ).rows[0].r;
+
+    const before = await byToken();
+    expect(before.can_reschedule).toBe(true);
+    expect(before.rescheduled_at).toBeNull();
+
+    const moved = (await reschedule(r.cancel_token, bogota(TUESDAY, "15:00"))).rows[0].r;
+    expect(moved.can_reschedule).toBe(false);
+    expect(moved.rescheduled_at).not.toBeNull();
+
+    await expect(reschedule(r.cancel_token, bogota(TUESDAY, "16:00"))).rejects.toThrow(/ALREADY_RESCHEDULED/);
+    // El intento fallido no movió la cita.
+    const after = await byToken();
+    expect(new Date(after.starts_at).toISOString()).toBe(bogota(TUESDAY, "15:00"));
+    expect(after.can_reschedule).toBe(false);
+    expect(after.can_cancel).toBe(true);
+
+    const cancelled = await as(db, { role: "service_role" }, (tx) =>
+      tx.query<{ r: { status: string } }>("select public.cancel_appointment_by_token($1) as r", [r.cancel_token]),
+    );
+    expect(cancelled.rows[0].r.status).toBe("cancelled");
+  });
+
+  it("un intento de reprogramar que falla no gasta la reprogramación", async () => {
+    const a = await book(bogota(TUESDAY, "10:00"), CAMILO, "a@example.com");
+    await book(bogota(TUESDAY, "12:00"), CAMILO, "b@example.com");
+    await expect(reschedule(a.cancel_token, bogota(TUESDAY, "12:00"))).rejects.toThrow(/SLOT_UNAVAILABLE/);
+    const moved = (await reschedule(a.cancel_token, bogota(TUESDAY, "15:00"))).rows[0].r;
+    expect(new Date(moved.starts_at).toISOString()).toBe(bogota(TUESDAY, "15:00"));
+  });
+
   it("no deja reprogramar dentro de la ventana de aviso", async () => {
     const r = await book(bogota(TUESDAY, "10:00"), CAMILO);
     await db.query("update public.appointments set starts_at = now() + interval '30 minutes', ends_at = now() + interval '75 minutes'");

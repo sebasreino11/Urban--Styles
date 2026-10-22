@@ -112,11 +112,12 @@ export async function getBookingByToken(token: string): Promise<TokenAppointment
   return (data as TokenAppointment | null) ?? null;
 }
 
-/** Cita reprogramable por token: misma regla (y ventana) que la cancelación. */
+/** Cita reprogramable por token: misma ventana que la cancelación y una sola vez. */
 async function getReschedulable(token: string): Promise<TokenAppointment & { service_id: string }> {
   const appt = await getBookingByToken(token);
   if (!appt) throw new DomainError("APPOINTMENT_NOT_FOUND");
   if (appt.status !== "pending" && appt.status !== "confirmed") throw new DomainError("NOT_RESCHEDULABLE");
+  if (appt.rescheduled_at) throw new DomainError("ALREADY_RESCHEDULED");
   if (!appt.can_cancel) throw new DomainError("TOO_LATE_TO_RESCHEDULE");
   if (!appt.service_id) throw new DomainError("NOT_RESCHEDULABLE");
   return appt as TokenAppointment & { service_id: string };

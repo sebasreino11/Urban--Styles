@@ -48,20 +48,22 @@ export default async function ShopPage({
 
   return (
     <div className="min-h-svh">
-      <div className="barber-stripe h-1.5" aria-hidden />
-      <header className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6 sm:py-4">
-        <Link href="/" className="flex min-w-0 items-center gap-3">
-          <Logo size={44} className="size-10 sm:size-11" />
-          <span className="truncate font-display text-lg font-bold tracking-wide sm:text-xl">{shop.name}</span>
-        </Link>
-        <nav className="flex items-center gap-6 text-sm">
-          <a href="#precios" className="hidden hover:text-gold-ink sm:inline">Precios</a>
-          <a href="#equipo" className="hidden hover:text-gold-ink sm:inline">Equipo</a>
-          <a href="#visitanos" className="hidden hover:text-gold-ink sm:inline">Cómo llegar</a>
-          <a href="#reservar" className="rounded-lg bg-primary px-4 py-2 font-medium text-gold-light shadow-soft transition-colors hover:bg-primary/90">
-            Reservar
-          </a>
-        </nav>
+      {/* Banda de carbón con filete dorado; la sombra la despega del crema. */}
+      <header className="relative z-10 border-b border-gold/70 bg-gradient-to-b from-[hsl(30_17%_19%)] to-primary text-primary-foreground shadow-[0_14px_32px_-14px_hsl(var(--primary)/0.6)]">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6 sm:py-4">
+          <Link href="/" className="flex min-w-0 items-center gap-3">
+            <Logo size={72} className="size-14 ring-1 ring-gold/70 sm:size-[72px]" />
+            <span className="truncate font-display text-xl font-extrabold uppercase tracking-wide sm:text-2xl">{shop.name}</span>
+          </Link>
+          <nav className="flex items-center gap-6 text-sm">
+            <a href="#precios" className="hidden text-primary-foreground/80 hover:text-gold-light sm:inline">Precios</a>
+            <a href="#equipo" className="hidden text-primary-foreground/80 hover:text-gold-light sm:inline">Equipo</a>
+            <a href="#visitanos" className="hidden text-primary-foreground/80 hover:text-gold-light sm:inline">Cómo llegar</a>
+            <a href="#reservar" className="rounded-lg bg-gold px-4 py-2 font-semibold text-primary transition-colors hover:bg-gold-light">
+              Reservar
+            </a>
+          </nav>
+        </div>
       </header>
 
       <main>
@@ -73,13 +75,13 @@ export default async function ShopPage({
             src="/brand/logo.png"
             alt=""
             aria-hidden
-            className="pointer-events-none absolute -right-48 top-6 w-[34rem] max-w-none select-none opacity-[0.06] mix-blend-multiply grayscale lg:right-[calc(50%-40rem)] lg:top-0 lg:w-[40rem]"
+            className="pointer-events-none absolute -right-48 top-6 w-[34rem] max-w-none select-none opacity-[0.06] mix-blend-multiply grayscale lg:left-[calc(50%-14rem)] lg:right-auto lg:top-10 lg:w-[40rem] lg:opacity-[0.09]"
           />
           <section className="relative mx-auto grid max-w-6xl gap-10 px-4 pb-16 pt-8 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 lg:pb-24 lg:pt-14">
             <div className="flex flex-col">
-              <h1 className="display-fine font-display font-bold leading-[0.92] tracking-tight text-primary">
-                <span className="block text-[clamp(3.25rem,12vw,7.5rem)]">{first}</span>
-                {nameRest && <span className="block text-[clamp(3.25rem,12vw,7.5rem)]">{nameRest}</span>}
+              <h1 className="font-display font-black uppercase leading-[0.82] text-primary">
+                <span className="block text-[clamp(5rem,19vw,11.5rem)]">{first}</span>
+                {nameRest && <span className="block text-[clamp(5rem,19vw,11.5rem)]">{nameRest}</span>}
               </h1>
               <ScissorsRule className="mt-7" />
               {shop.tagline && <p className="mt-6 max-w-md text-xl leading-snug">{shop.tagline}</p>}
@@ -124,7 +126,7 @@ export default async function ShopPage({
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
             <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
               <div>
-                <h2 className="display-fine font-display text-5xl font-bold leading-none sm:text-6xl">Precios</h2>
+                <h2 className="font-display text-6xl font-black uppercase leading-none text-gold-light">Precios</h2>
                 <ScissorsRule className="mt-5 text-gold" />
                 <p className="mt-5 max-w-xs text-primary-foreground/75">
                   Precios en pesos colombianos. Elige un servicio para ver los horarios disponibles.
@@ -138,9 +140,9 @@ export default async function ShopPage({
                       className="group -mx-3 block rounded-lg px-3 py-3 transition-colors hover:bg-primary-foreground/[0.06]"
                     >
                       <div className="flex items-baseline gap-3">
-                        <span className="font-display text-2xl font-semibold sm:text-3xl">{s.name}</span>
+                        <span className="font-display text-2xl font-extrabold uppercase tracking-wide sm:text-3xl">{s.name}</span>
                         <span className="leader h-4 min-w-6 flex-1" aria-hidden />
-                        <span className="font-display text-2xl font-semibold tabular-nums text-gold-light sm:text-3xl">{formatCOP(s.price_cop)}</span>
+                        <span className="font-display text-2xl font-extrabold tabular-nums text-gold-light sm:text-3xl">{formatCOP(s.price_cop)}</span>
                       </div>
                       <p className="mt-0.5 text-sm text-primary-foreground/70">
                         {formatDuration(s.duration_min)}
@@ -156,19 +158,19 @@ export default async function ShopPage({
 
         {/* Equipo */}
         <section id="equipo" className="mx-auto max-w-6xl scroll-mt-4 px-4 py-16 sm:px-6 lg:py-24">
-          <h2 className="font-display text-4xl font-bold leading-none text-primary sm:text-5xl">Quién te atiende</h2>
+          <h2 className="font-display text-5xl font-black uppercase leading-none text-primary">Quién te atiende</h2>
           <ScissorsRule className="mt-5" />
           <ul className="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
             {barbers.map((b) => (
               <li key={b.id} className="flex gap-4">
                 {b.photo_url ? (
                   // eslint-disable-next-line @next/next/no-img-element -- URLs externas arbitrarias; sin optimizador de imágenes (costo cero)
-                  <img src={b.photo_url} alt="" className="size-16 shrink-0 rounded-full object-cover ring-1 ring-gold ring-offset-2 ring-offset-background" />
+                  <img src={b.photo_url} alt="" className="size-16 shrink-0 rounded-full object-cover ring-2 ring-gold ring-offset-2 ring-offset-background" />
                 ) : (
                   <Monogram name={b.display_name} className="size-16 text-2xl" />
                 )}
                 <div>
-                  <p className="font-display text-2xl font-semibold">{b.display_name}</p>
+                  <p className="font-display text-2xl font-extrabold uppercase tracking-wide">{b.display_name}</p>
                   {b.bio && <p className="mt-1 text-muted-foreground">{b.bio}</p>}
                 </div>
               </li>
@@ -180,7 +182,7 @@ export default async function ShopPage({
         <section id="visitanos" className="scroll-mt-4 border-t border-border">
           <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
             <div>
-              <h2 className="font-display text-4xl font-bold leading-none text-primary sm:text-5xl">La casa</h2>
+              <h2 className="font-display text-5xl font-black uppercase leading-none text-primary">La casa</h2>
               <ScissorsRule className="mt-5" />
               {shop.about && <p className="mt-6 max-w-prose text-lg leading-relaxed">{shop.about}</p>}
               <div className="mt-8 grid gap-2 text-sm">
@@ -225,7 +227,7 @@ export default async function ShopPage({
             </div>
 
             <div>
-              <h3 className="font-display text-3xl font-semibold text-primary">Horario</h3>
+              <h3 className="font-display text-3xl font-extrabold uppercase text-primary">Horario</h3>
               <table className="mt-4 w-full max-w-md text-left">
                 <tbody>
                   {WEEK_ORDER.map((d) => {
@@ -249,7 +251,7 @@ export default async function ShopPage({
         </section>
       </main>
 
-      <footer className="relative overflow-hidden bg-primary text-primary-foreground">
+      <footer className="relative overflow-hidden border-t-4 border-gold bg-primary text-primary-foreground">
         {/* eslint-disable-next-line @next/next/no-img-element -- decorativa, sin optimizador */}
         <img
           src="/brand/logo-gold.png"
@@ -258,9 +260,9 @@ export default async function ShopPage({
           className="pointer-events-none absolute -right-28 -top-20 w-[26rem] max-w-none select-none opacity-[0.09] sm:right-0"
         />
         <div className="relative mx-auto grid max-w-6xl gap-6 px-4 py-12 sm:grid-cols-[auto_1fr_auto] sm:items-center sm:gap-8 sm:px-6">
-          <Logo size={64} />
+          <Logo size={112} className="size-24 sm:size-28" />
           <div>
-            <p className="font-display text-2xl font-bold">{shop.name}</p>
+            <p className="font-display text-2xl font-extrabold uppercase tracking-wide text-gold-light">{shop.name}</p>
             {shop.address && (
               <p className="mt-1 text-sm text-primary-foreground/70">
                 {shop.address}{shop.city && `, ${shop.city}`}

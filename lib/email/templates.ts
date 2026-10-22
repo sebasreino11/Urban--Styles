@@ -26,7 +26,7 @@ interface ConfirmationData {
 function row(label: string, value: string) {
   return `<tr>
     <td style="padding:10px 0;border-bottom:1px solid #D7C9B6;color:#6B5E50;font-size:13px;">${label}</td>
-    <td style="padding:10px 0;border-bottom:1px solid #D7C9B6;color:#17130F;font-size:15px;text-align:right">${value}</td>
+    <td style="padding:10px 0;border-bottom:1px solid #D7C9B6;color:#2A241E;font-size:15px;text-align:right">${value}</td>
   </tr>`;
 }
 
@@ -42,9 +42,9 @@ export function bookingConfirmationEmail(d: ConfirmationData) {
 <html lang="es"><body style="margin:0;background:#EFE6DC;font-family:Georgia,'Times New Roman',serif">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#EFE6DC;padding:32px 12px">
 <tr><td align="center">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#FAF6F0;border:1px solid #D7C9B6;border-top:3px solid #C4954F">
-  <tr><td style="padding:28px 32px 8px;color:#7A5A22;font-size:13px;font-weight:bold;font-family:Arial,sans-serif">${esc(d.shopName)}</td></tr>
-  <tr><td style="padding:0 32px 8px;color:#17130F;font-size:28px;line-height:1.2">Te esperamos, ${esc(firstName)}.</td></tr>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#FAF6F0;border:1px solid #D7C9B6;border-top:4px solid #D4A23A">
+  <tr><td style="padding:28px 32px 8px;color:#7D5A0C;font-size:13px;font-weight:bold;font-family:Arial,sans-serif">${esc(d.shopName)}</td></tr>
+  <tr><td style="padding:0 32px 8px;color:#2A241E;font-size:28px;line-height:1.2">Te esperamos, ${esc(firstName)}.</td></tr>
   <tr><td style="padding:0 32px 20px;color:#3A322A;font-size:15px;line-height:1.6;font-family:Arial,sans-serif">Tu cita quedó confirmada. Aquí está el resumen:</td></tr>
   <tr><td style="padding:0 32px">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif">
@@ -57,10 +57,10 @@ export function bookingConfirmationEmail(d: ConfirmationData) {
     </table>
   </td></tr>
   <tr><td style="padding:28px 32px 8px;font-family:Arial,sans-serif">
-    <a href="${esc(d.manageUrl)}" style="display:inline-block;background:#17130F;color:#E3B266;text-decoration:none;padding:12px 22px;border-radius:8px;font-size:14px;font-weight:bold;letter-spacing:.04em">Ver, reprogramar o cancelar mi cita</a>
+    <a href="${esc(d.manageUrl)}" style="display:inline-block;background:#D4A23A;color:#2A241E;text-decoration:none;padding:12px 22px;border-radius:8px;font-size:14px;font-weight:bold;letter-spacing:.04em">Ver, reprogramar o cancelar mi cita</a>
   </td></tr>
   <tr><td style="padding:8px 32px 28px;color:#6B5E50;font-size:12px;line-height:1.6;font-family:Arial,sans-serif">
-    Puedes reprogramar o cancelar en línea hasta ${notice} antes.${d.shopPhone ? ` Para cambios de último momento llama al ${esc(d.shopPhone)}.` : ""}
+    Puedes reprogramar (una sola vez) o cancelar en línea hasta ${notice} antes.${d.shopPhone ? ` Para cambios de último momento llama al ${esc(d.shopPhone)}.` : ""}
   </td></tr>
 </table>
 </td></tr></table>
@@ -99,9 +99,9 @@ export function bookingRescheduledEmail(d: RescheduledData) {
 <html lang="es"><body style="margin:0;background:#EFE6DC;font-family:Georgia,'Times New Roman',serif">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#EFE6DC;padding:32px 12px">
 <tr><td align="center">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#FAF6F0;border:1px solid #D7C9B6;border-top:3px solid #C4954F">
-  <tr><td style="padding:28px 32px 8px;color:#7A5A22;font-size:13px;font-weight:bold;font-family:Arial,sans-serif">${esc(d.shopName)}</td></tr>
-  <tr><td style="padding:0 32px 8px;color:#17130F;font-size:28px;line-height:1.2">Cambiamos tu cita, ${esc(firstName)}.</td></tr>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#FAF6F0;border:1px solid #D7C9B6;border-top:4px solid #D4A23A">
+  <tr><td style="padding:28px 32px 8px;color:#7D5A0C;font-size:13px;font-weight:bold;font-family:Arial,sans-serif">${esc(d.shopName)}</td></tr>
+  <tr><td style="padding:0 32px 8px;color:#2A241E;font-size:28px;line-height:1.2">Cambiamos tu cita, ${esc(firstName)}.</td></tr>
   <tr><td style="padding:0 32px 20px;color:#3A322A;font-size:15px;line-height:1.6;font-family:Arial,sans-serif">Tu cita quedó reprogramada. Este es el nuevo horario:</td></tr>
   <tr><td style="padding:0 32px">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif">
@@ -115,10 +115,10 @@ export function bookingRescheduledEmail(d: RescheduledData) {
     </table>
   </td></tr>
   <tr><td style="padding:28px 32px 8px;font-family:Arial,sans-serif">
-    <a href="${esc(d.manageUrl)}" style="display:inline-block;background:#17130F;color:#E3B266;text-decoration:none;padding:12px 22px;border-radius:8px;font-size:14px;font-weight:bold;letter-spacing:.04em">Ver, reprogramar o cancelar mi cita</a>
+    <a href="${esc(d.manageUrl)}" style="display:inline-block;background:#D4A23A;color:#2A241E;text-decoration:none;padding:12px 22px;border-radius:8px;font-size:14px;font-weight:bold;letter-spacing:.04em">Ver o cancelar mi cita</a>
   </td></tr>
   <tr><td style="padding:8px 32px 28px;color:#6B5E50;font-size:12px;line-height:1.6;font-family:Arial,sans-serif">
-    Puedes reprogramar o cancelar en línea hasta ${notice} antes.${d.shopPhone ? ` Para cambios de último momento llama al ${esc(d.shopPhone)}.` : ""}
+    Ya usaste tu reprogramación en línea. Puedes cancelar hasta ${notice} antes.${d.shopPhone ? ` Para cambios de último momento llama al ${esc(d.shopPhone)}.` : ""}
   </td></tr>
 </table>
 </td></tr></table>
@@ -135,7 +135,7 @@ export function bookingRescheduledEmail(d: RescheduledData) {
     `Valor: ${formatCOP(d.priceCop)}`,
     ...(d.shopAddress ? [`Dirección: ${d.shopAddress}`] : []),
     ``,
-    `Ver, reprogramar o cancelar: ${d.manageUrl}`,
+    `Ver o cancelar: ${d.manageUrl}`,
   ].join("\n");
 
   return { subject, html, text };

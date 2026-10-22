@@ -9,7 +9,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ["var(--font-display)", "Georgia", "serif"],
+        display: ["var(--font-display)", "Impact", "sans-serif"],
         sans: ["var(--font-text)", "system-ui", "sans-serif"],
       },
       colors: {

@@ -68,14 +68,14 @@ export default async function InsightsPage({ searchParams }: { searchParams: Pro
       )}
 
       <section className="mt-12">
-        <h2 className="font-display text-2xl font-semibold text-primary">Citas por día</h2>
+        <h2 className="font-display text-2xl font-extrabold uppercase text-primary">Citas por día</h2>
         <p className="mb-4 text-sm text-muted-foreground">Sin contar canceladas.</p>
         <DailyBars daily={i.daily} fromDate={fromDate} days={RANGES[range]} timezone={tz} />
       </section>
 
       <div className="mt-12 grid gap-12 lg:grid-cols-2">
         <section>
-          <h2 className="mb-4 font-display text-2xl font-semibold text-primary">Servicios más pedidos</h2>
+          <h2 className="mb-4 font-display text-2xl font-extrabold uppercase text-primary">Servicios más pedidos</h2>
           {i.top_services.length ? (
             <ul className="grid gap-3">
               {i.top_services.map((s) => (
@@ -90,7 +90,7 @@ export default async function InsightsPage({ searchParams }: { searchParams: Pro
         </section>
 
         <section>
-          <h2 className="mb-4 font-display text-2xl font-semibold text-primary">Por barbero</h2>
+          <h2 className="mb-4 font-display text-2xl font-extrabold uppercase text-primary">Por barbero</h2>
           {i.by_barber.length ? (
             <ul className="grid gap-3">
               {i.by_barber.map((b) => (
@@ -113,7 +113,7 @@ export default async function InsightsPage({ searchParams }: { searchParams: Pro
 
       {next && (
         <section className="mt-12 border-t border-border pt-8">
-          <h2 className="font-display text-2xl font-semibold text-primary">Próximos 7 días</h2>
+          <h2 className="font-display text-2xl font-extrabold uppercase text-primary">Próximos 7 días</h2>
           <div className="mt-4 grid grid-cols-2 gap-6 lg:grid-cols-4">
             <Stat label="Citas confirmadas" value={String(next.upcoming)} />
             <Stat label="Ingreso esperado" value={formatCOP(next.expected_cop)} />

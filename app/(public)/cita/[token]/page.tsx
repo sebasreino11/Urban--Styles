@@ -28,7 +28,7 @@ export default async function AppointmentPage({ params }: { params: Promise<{ to
       {!appt ? (
         <div>
           <Logo size={64} />
-          <h1 className="mt-6 font-display text-5xl font-bold text-primary">Enlace no válido</h1>
+          <h1 className="mt-6 font-display text-5xl font-black uppercase text-primary">Enlace no válido</h1>
           <p className="mt-3 text-muted-foreground">
             No encontramos una cita con este enlace. Copia el enlace completo del correo de confirmación.
           </p>
@@ -37,14 +37,14 @@ export default async function AppointmentPage({ params }: { params: Promise<{ to
           </Link>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl bg-card shadow-lift ring-1 ring-gold/30">
+        <div className="overflow-hidden rounded-xl bg-card shadow-lift ring-2 ring-gold">
           <div className="barber-stripe h-2" aria-hidden />
           <div className="px-6 py-6">
             <p className="text-sm text-muted-foreground">
               {appt.shop_name} · {STATUS_LABEL[appt.status]}
             </p>
             <p
-              className={`mt-2 font-display text-6xl font-bold leading-[0.9] text-primary ${appt.status === "cancelled" ? "line-through decoration-destructive decoration-4" : ""}`}
+              className={`mt-2 font-display text-6xl font-black uppercase leading-[0.9] text-primary ${appt.status === "cancelled" ? "line-through decoration-destructive decoration-4" : ""}`}
             >
               {formatTime(appt.starts_at, appt.timezone)}
             </p>
@@ -68,8 +68,15 @@ export default async function AppointmentPage({ params }: { params: Promise<{ to
             <div className="mt-8 border-t border-border pt-5">
               {appt.can_cancel ? (
                 <div className="grid gap-5">
-                  {appt.service_id && (
+                  {appt.can_reschedule ? (
                     <RescheduleButton token={token} timezone={appt.timezone} currentStartsAt={appt.starts_at} />
+                  ) : (
+                    appt.rescheduled_at && (
+                      <p className="text-sm text-muted-foreground">
+                        Ya reprogramaste esta cita una vez, así que no se puede volver a mover en línea.
+                        {appt.shop_phone && <> Si necesitas otro cambio, llama al {appt.shop_phone}.</>}
+                      </p>
+                    )
                   )}
                   <CancelButton token={token} />
                 </div>

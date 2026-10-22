@@ -59,7 +59,7 @@ export function ShopProfileForm({ shop }: { shop: ShopRow }) {
       className="grid gap-8"
     >
       <section className="grid gap-4">
-        <h2 className="font-display text-2xl font-semibold text-primary">Página pública</h2>
+        <h2 className="font-display text-2xl font-extrabold uppercase text-primary">Página pública</h2>
         <Field label="Nombre"><input className={inputClass} {...bind("name")} required /></Field>
         <Field label="Frase corta" hint="Aparece debajo del nombre."><input className={inputClass} {...bind("tagline")} maxLength={140} /></Field>
         <Field label="Sobre la barbería"><textarea className={`${inputClass} h-32 py-2`} {...bind("about")} maxLength={1200} /></Field>
@@ -75,7 +75,7 @@ export function ShopProfileForm({ shop }: { shop: ShopRow }) {
       </section>
 
       <section className="grid gap-4">
-        <h2 className="font-display text-2xl font-semibold text-primary">Reglas de reserva</h2>
+        <h2 className="font-display text-2xl font-extrabold uppercase text-primary">Reglas de reserva</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Intervalo entre horarios" hint="Cada cuánto se ofrece un horario.">
             <select className={inputClass} {...bind("slotIntervalMin")}>

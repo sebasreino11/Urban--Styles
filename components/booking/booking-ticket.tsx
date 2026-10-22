@@ -219,7 +219,7 @@ export function BookingTicket({ services, barbers, timezone, horizonDays, initia
             <button
               type="submit"
               disabled={submitting || !name || !email}
-              className="mt-1 inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-primary px-6 font-display text-xl font-semibold text-gold-light shadow-soft ring-1 ring-inset ring-gold/40 transition-colors hover:bg-primary/90 disabled:opacity-50"
+              className="mt-1 inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-gold px-6 font-display text-xl font-extrabold uppercase tracking-wide text-primary shadow-soft transition-colors hover:bg-gold-light disabled:opacity-50"
             >
               {submitting && <Loader2 className="size-5 animate-spin" aria-hidden />}
               {submitting ? "Reservando" : "Reservar cita"}
@@ -244,10 +244,10 @@ const inputClass =
 
 function TicketShell({ children }: { children: React.ReactNode }) {
   return (
-    <div id="reservar" className="relative scroll-mt-6 overflow-hidden rounded-xl bg-card text-card-foreground shadow-lift ring-1 ring-gold/30">
+    <div id="reservar" className="relative scroll-mt-6 overflow-hidden rounded-xl bg-card text-card-foreground shadow-lift ring-2 ring-gold">
       <div className="barber-stripe h-2" aria-hidden />
       <div className="flex items-baseline justify-between gap-3 px-5 pb-3 pt-5">
-        <h2 className="font-display text-3xl font-bold leading-none text-primary">Tu turno</h2>
+        <h2 className="font-display text-3xl font-black uppercase leading-none text-primary">Tu turno</h2>
         <span className="text-xs text-muted-foreground">Sin registro · 1 minuto</span>
       </div>
       <div className="ticket-perforation h-3 border-t border-dashed border-border" aria-hidden />
@@ -269,8 +269,8 @@ function Step({
       <div className="flex items-center gap-3">
         <span
           className={cn(
-            "flex size-7 shrink-0 items-center justify-center rounded-full border font-display text-base font-bold",
-            done && !open ? "border-primary bg-primary text-gold-light" : open ? "border-primary text-primary" : "border-border text-muted-foreground",
+            "flex size-7 shrink-0 items-center justify-center rounded-full border font-display text-base font-extrabold",
+            done && !open ? "border-gold bg-gold text-primary" : open ? "border-gold-ink text-gold-ink" : "border-border text-muted-foreground",
           )}
           aria-hidden
         >
@@ -300,7 +300,7 @@ function Choice({ selected, onClick, children }: { selected: boolean; onClick: (
       onClick={onClick}
       className={cn(
         "flex min-h-12 w-full items-center gap-3 rounded-lg border px-3 py-2 text-left transition-colors",
-        selected ? "border-primary bg-primary text-primary-foreground shadow-soft [&_.text-muted-foreground]:text-primary-foreground/70" : "border-border bg-background/40 hover:border-gold",
+        selected ? "border-gold bg-primary text-gold-light shadow-soft [&_.text-muted-foreground]:text-primary-foreground/70" : "border-border bg-background/40 hover:border-gold",
       )}
     >
       {children}
@@ -311,7 +311,7 @@ function Choice({ selected, onClick, children }: { selected: boolean; onClick: (
 export function Monogram({ name, className }: { name: string; className?: string }) {
   const initials = name.split(/\s+/).map((p) => p[0]).slice(0, 2).join("");
   return (
-    <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-full bg-primary font-display text-sm font-semibold uppercase text-gold-light ring-1 ring-gold/60", className)} aria-hidden>
+    <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-full bg-primary font-display text-sm font-extrabold uppercase text-gold-light ring-2 ring-gold", className)} aria-hidden>
       {initials}
     </span>
   );
@@ -331,7 +331,7 @@ function Confirmation({ c, timezone }: { c: BookingConfirmation; timezone: strin
   return (
     <TicketShell>
       <div className="px-5 py-6" role="status">
-        <p className="font-display text-5xl font-bold leading-[0.9] text-primary">
+        <p className="font-display text-5xl font-black uppercase leading-[0.9] text-primary">
           {formatTime(c.startsAt, timezone)}
         </p>
         <p className="mt-1 text-lg capitalize">{formatDate(c.startsAt, timezone)}</p>

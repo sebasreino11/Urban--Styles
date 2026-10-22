@@ -96,6 +96,9 @@ export interface TokenAppointment {
   shop_address: string | null;
   timezone: string;
   can_cancel: boolean;
+  /** Solo una reprogramación por cita, con la misma ventana que la cancelación. */
+  can_reschedule: boolean;
+  rescheduled_at: string | null;
   cancel_notice_min: number;
 }
 

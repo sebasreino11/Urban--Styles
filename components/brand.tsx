@@ -16,10 +16,10 @@ export function Logo({ size, alt = "", className }: { size: number; alt?: string
 /** El ornamento "—✂—" del pie del logo, usado como divisor bajo los títulos. */
 export function ScissorsRule({ className }: { className?: string }) {
   return (
-    <div className={cn("flex items-center gap-3 text-gold-ink", className)} aria-hidden>
-      <span className="h-px w-10 bg-current" />
-      <Scissors className="size-4 -rotate-90" strokeWidth={1.75} />
-      <span className="h-px w-10 bg-current" />
+    <div className={cn("flex items-center gap-3 text-gold", className)} aria-hidden>
+      <span className="h-0.5 w-12 bg-current" />
+      <Scissors className="size-5 -rotate-90" strokeWidth={2} />
+      <span className="h-0.5 w-12 bg-current" />
     </div>
   );
 }

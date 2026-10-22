@@ -3,40 +3,38 @@
 @tailwind utilities;
 
 /*
- * Identidad tomada del logo (negro laca con filetes dorados y poste de barbero):
- *   crema #EFE6DC · tinta #17130F · oro #C4954F · oro claro #E3B266
- *   oro tinta #7A5A22 · rojo poste #A51C17 · azul poste #1D3A94
- * El oro medio no alcanza contraste como texto sobre crema (2.2:1); sobre
+ * Identidad tomada del logo (negro laca con filetes dorados):
+ *   crema #EFE6DC · tinta (carbón cálido) #2A241E · oro #D4A23A · oro claro #F2C14E
+ *   oro tinta #7D5A0C · rojo #A51C17 (errores y cancelaciones)
+ * El oro medio no alcanza contraste como texto sobre crema (1.9:1); sobre
  * fondos claros se usa oro tinta. Los tokens siguen la convención de
  * shadcn/ui (HSL sin hsl()).
  */
 @layer base {
   :root {
     --background: 32 37% 90%;
-    --foreground: 30 21% 7%;
+    --foreground: 30 17% 14%;
     --card: 36 50% 96%;
-    --card-foreground: 30 21% 7%;
+    --card-foreground: 30 17% 14%;
     --popover: 36 50% 96%;
-    --popover-foreground: 30 21% 7%;
-    --primary: 30 21% 7%;
+    --popover-foreground: 30 17% 14%;
+    --primary: 30 17% 14%;
     --primary-foreground: 32 37% 90%;
     --secondary: 33 35% 85%;
-    --secondary-foreground: 30 21% 7%;
+    --secondary-foreground: 30 17% 14%;
     --muted: 33 35% 85%;
     --muted-foreground: 31 14% 37%;
-    --accent: 36 50% 54%;
-    --accent-foreground: 30 21% 7%;
+    --accent: 41 64% 53%;
+    --accent-foreground: 30 17% 14%;
     --destructive: 2 76% 37%;
     --destructive-foreground: 36 50% 96%;
     --border: 35 29% 78%;
     --input: 32 16% 47%;
-    --ring: 38 56% 31%;
+    --ring: 41 82% 27%;
     --success: 146 44% 33%;
     --warning: 38 79% 30%;
-    --gold-light: 36 69% 65%;
-    --gold-ink: 38 56% 31%;
-    --pole-red: 2 76% 37%;
-    --pole-blue: 225 67% 35%;
+    --gold-light: 42 86% 63%;
+    --gold-ink: 41 82% 27%;
     --radius: 0.5rem;
   }
 }
@@ -58,34 +56,20 @@
   }
 }
 
-@layer utilities {
-  /* Con el tamaño óptico automático, Bodoni deja filetes casi invisibles
-     ("+", "$", "4", la "U"). Por defecto se usa el corte robusto; solo los
-     titulares grandes piden más contraste con .display-fine. */
-  .font-display {
-    font-variation-settings: "opsz" 12;
-  }
-  .display-fine {
-    font-variation-settings: "opsz" 28;
-  }
-}
-
 @layer components {
-  /* Franja de poste de barbero. Única animación ambiental del sitio. */
+  /* Franja de poste de barbero en oro y negro. Única animación ambiental del sitio. */
   .barber-stripe {
     background-image: repeating-linear-gradient(
       -45deg,
-      hsl(var(--pole-red)) 0 10px,
-      hsl(var(--card)) 10px 20px,
-      hsl(var(--pole-blue)) 20px 30px,
-      hsl(var(--card)) 30px 40px
+      hsl(var(--accent)) 0 10px,
+      hsl(var(--primary)) 10px 20px
     );
-    background-size: 56.57px 56.57px;
+    background-size: 28.28px 28.28px;
     animation: stripe-move 2.4s linear infinite;
   }
   @keyframes stripe-move {
     to {
-      background-position: 56.57px 0;
+      background-position: 28.28px 0;
     }
   }
 
@@ -98,7 +82,7 @@
 
   /* Lista de precios con puntos guía dorados, como el tablero de la barbería. */
   .leader {
-    background-image: radial-gradient(circle, hsl(var(--accent) / 0.7) 1px, transparent 1.5px);
+    background-image: radial-gradient(circle, hsl(var(--accent)) 1px, transparent 1.5px);
     background-size: 7px 4px;
     background-repeat: repeat-x;
     background-position: 0 calc(100% - 0.35em);

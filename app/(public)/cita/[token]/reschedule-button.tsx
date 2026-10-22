@@ -66,13 +66,16 @@ export function RescheduleButton({ token, timezone, currentStartsAt }: Props) {
 
   if (!open) {
     return (
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="text-sm font-medium text-gold-ink underline underline-offset-4"
-      >
-        Reprogramar esta cita
-      </button>
+      <div className="grid justify-items-start gap-1">
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="text-sm font-medium text-gold-ink underline underline-offset-4"
+        >
+          Reprogramar esta cita
+        </button>
+        <p className="text-xs text-muted-foreground">Puedes reprogramarla una sola vez.</p>
+      </div>
     );
   }
 
@@ -87,6 +90,8 @@ export function RescheduleButton({ token, timezone, currentStartsAt }: Props) {
         return;
       }
       setError(r.message);
+      // Ya se reprogramó (p. ej. desde otra pestaña): la página dejará de ofrecerlo.
+      if (r.code === "ALREADY_RESCHEDULED") router.refresh();
       if (r.code === "SLOT_TAKEN" || r.code === "SLOT_UNAVAILABLE") {
         setSlot(null);
         void refreshSlots();
@@ -114,6 +119,7 @@ export function RescheduleButton({ token, timezone, currentStartsAt }: Props) {
             ¿Mover tu cita al <span className="font-medium capitalize">{formatDate(slot.startsAt, timezone)}</span> a las{" "}
             <span className="font-medium">{formatTime(slot.startsAt, timezone)}</span>?
           </p>
+          <p className="text-xs text-muted-foreground">Después no podrás volver a reprogramarla en línea.</p>
           <div className="flex flex-wrap gap-2">
             <button
               type="button"

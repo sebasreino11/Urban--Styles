@@ -12,6 +12,7 @@ export const ERROR_MESSAGES = {
   TOO_LATE_TO_CANCEL: "Ya es muy tarde para cancelar en línea. Comunícate con la barbería.",
   NOT_RESCHEDULABLE: "Esta cita ya no se puede reprogramar.",
   TOO_LATE_TO_RESCHEDULE: "Ya es muy tarde para reprogramar en línea. Comunícate con la barbería.",
+  ALREADY_RESCHEDULED: "Esta cita ya se reprogramó una vez. Para otro cambio, comunícate con la barbería.",
   SAME_SLOT: "Elige un horario distinto al actual.",
   INVALID_TRANSITION: "Ese cambio de estado no es válido.",
   APPOINTMENT_NOT_STARTED: "No puedes cerrar una cita que todavía no ha empezado.",

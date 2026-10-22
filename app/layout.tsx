@@ -1,12 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Bodoni_Moda, Libre_Franklin } from "next/font/google";
+import { Big_Shoulders, Libre_Franklin } from "next/font/google";
 import "./globals.css";
 
-// Variable con tamaño óptico: trazos finos en titulares, robustos en cifras pequeñas.
-const display = Bodoni_Moda({
+const display = Big_Shoulders({
   variable: "--font-display",
   subsets: ["latin"],
-  axes: ["opsz"],
+  weight: ["600", "800", "900"],
   display: "swap",
 });
 
@@ -24,7 +23,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#17130F",
+  themeColor: "#2A241E",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

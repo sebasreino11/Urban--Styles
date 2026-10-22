@@ -59,7 +59,7 @@ export async function sendPush(
   const res = await fetch(hookUrl.replace(/\/+$/, ""), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ tags: "citas", color: "#C4954F", ...payload }),
+    body: JSON.stringify({ tags: "citas", color: "#D4A23A", ...payload }),
   });
   const text = await res.text();
   if (!res.ok || /"status"\s*:\s*"(?!ok)/.test(text)) {
@@ -144,28 +144,49 @@ export async function notifyBookingCreated(booking: Booking) {
   await Promise.all(tasks);
 }
 
+/** Texto para notification_log a partir de un error de PostgREST. */
+function dbDetail(what: string, error: { code?: string; message?: string } | null) {
+  return error ? `${what}: ${error.code ?? ""} ${error.message ?? ""}`.trim() : `${what}: no encontrada`;
+}
+
 /**
  * Correo al cliente + push al barbero cuando el cliente reprograma desde el
  * enlace. `token` es el del enlace (en la BD solo se guarda su hash).
+ *
+ * appointments no tiene FK directa a barbershops, así que la barbería se lee
+ * aparte: embeberla (`shop:barbershops(...)`) hace fallar la consulta entera.
  */
-export async function notifyBookingRescheduled(appointmentId: string, previousStartsAt: string, token: string) {
+export async function notifyBookingRescheduled(
+  shopId: string,
+  appointmentId: string,
+  previousStartsAt: string,
+  token: string,
+) {
   try {
     const site = env.siteUrl();
-    const { data: a } = await createAdminClient()
+    const admin = createAdminClient();
+    const { data: a, error } = await admin
       .from("appointments")
       .select(
-        "barbershop_id, barber_id, starts_at, service_name, price_cop, barber:barbers(display_name), customer:customers(name, email), shop:barbershops(name, address, phone, timezone, cancel_notice_min)",
+        "barbershop_id, barber_id, starts_at, service_name, price_cop, barber:barbers(display_name), customer:customers(name, email)",
       )
       .eq("id", appointmentId)
       .single();
-    if (!a) return;
-    const shop = a.shop as unknown as {
-      name: string;
-      address: string | null;
-      phone: string | null;
-      timezone: string;
-      cancel_notice_min: number;
-    };
+    if (!a) {
+      console.error("notifyBookingRescheduled: cita no leída", error);
+      await log(shopId, appointmentId, "push", "booking_rescheduled", "failed", dbDetail("Cita", error));
+      return;
+    }
+    const { data: shop, error: shopError } = await admin
+      .from("barbershops")
+      .select("name, address, phone, timezone, cancel_notice_min")
+      .eq("id", a.barbershop_id)
+      .single();
+    if (!shop) {
+      console.error("notifyBookingRescheduled: barbería no leída", shopError);
+      await log(shopId, appointmentId, "push", "booking_rescheduled", "failed", dbDetail("Barbería", shopError));
+      return;
+    }
     const customer = a.customer as unknown as { name: string; email: string };
     const barber = a.barber as unknown as { display_name: string };
 
@@ -232,15 +253,30 @@ export async function notifyBookingRescheduled(appointmentId: string, previousSt
 }
 
 /** Push al barbero cuando el cliente cancela desde el enlace del correo. */
-export async function notifyBookingCancelled(appointmentId: string) {
+export async function notifyBookingCancelled(shopId: string, appointmentId: string) {
   try {
-    const { data: a } = await createAdminClient()
+    const admin = createAdminClient();
+    const { data: a, error } = await admin
       .from("appointments")
-      .select("barbershop_id, barber_id, starts_at, service_name, customer:customers(name), shop:barbershops(timezone)")
+      .select("barbershop_id, barber_id, starts_at, service_name, customer:customers(name)")
       .eq("id", appointmentId)
       .single();
-    if (!a) return;
-    const tz = (a.shop as unknown as { timezone: string }).timezone;
+    if (!a) {
+      console.error("notifyBookingCancelled: cita no leída", error);
+      await log(shopId, appointmentId, "push", "booking_cancelled", "failed", dbDetail("Cita", error));
+      return;
+    }
+    const { data: shop, error: shopError } = await admin
+      .from("barbershops")
+      .select("timezone")
+      .eq("id", a.barbershop_id)
+      .single();
+    if (!shop) {
+      console.error("notifyBookingCancelled: barbería no leída", shopError);
+      await log(shopId, appointmentId, "push", "booking_cancelled", "failed", dbDetail("Barbería", shopError));
+      return;
+    }
+    const tz = shop.timezone;
     const customer = (a.customer as unknown as { name: string }).name;
 
     const hookUrl = await getBarberHookUrl(a.barber_id);

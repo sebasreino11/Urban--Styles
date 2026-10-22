@@ -138,8 +138,10 @@ export async function rescheduleBooking(
   startsAt: string,
 ): Promise<ActionResult<RescheduledAppointment>> {
   try {
+    // La barbería se resuelve antes: si fallara después, el cliente vería un error con la cita ya movida.
+    const shop = await currentShop();
     const appt = await rescheduleBookingByToken(token, startsAt);
-    after(() => notifyBookingRescheduled(appt.appointment_id, appt.previous_starts_at, token));
+    after(() => notifyBookingRescheduled(shop.id, appt.appointment_id, appt.previous_starts_at, token));
     return { ok: true, data: appt };
   } catch (e) {
     return toActionError(e);
@@ -148,8 +150,9 @@ export async function rescheduleBooking(
 
 export async function cancelBooking(token: string): Promise<ActionResult<TokenAppointment>> {
   try {
+    const shop = await currentShop();
     const appt = await cancelBookingByToken(token);
-    after(() => notifyBookingCancelled(appt.appointment_id));
+    after(() => notifyBookingCancelled(shop.id, appt.appointment_id));
     return { ok: true, data: appt };
   } catch (e) {
     return toActionError(e);

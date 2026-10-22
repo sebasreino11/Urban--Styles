@@ -16,7 +16,7 @@ export function PageHeader({
   return (
     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 className="font-display text-4xl font-bold leading-none text-primary sm:text-5xl">{title}</h1>
+        <h1 className="font-display text-4xl font-black uppercase leading-none text-primary sm:text-5xl">{title}</h1>
         {description && <p className="mt-2 max-w-prose text-muted-foreground">{description}</p>}
       </div>
       {children}
@@ -73,7 +73,7 @@ export function Stat({ label, value, hint }: { label: string; value: string; hin
   return (
     <div className="border-l-2 border-gold pl-4">
       <p className="text-sm text-muted-foreground">{label}</p>
-      <p className="font-display text-4xl font-bold tabular-nums text-primary">{value}</p>
+      <p className="font-display text-4xl font-extrabold tabular-nums text-primary">{value}</p>
       {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
   );

@@ -24,16 +24,17 @@ export default async function StaffLayout({ children }: { children: React.ReactN
 
   return (
     <div className="min-h-svh bg-background">
-      <div className="barber-stripe h-1" aria-hidden />
       <header className="border-b border-border bg-card">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-          <Link href={ctx.isBarber ? "/agenda" : "/admin"} className="flex min-w-0 items-center gap-2.5">
-            <Logo size={36} />
-            <span className="truncate font-display text-xl font-bold tracking-wide text-primary">{ctx.shop.name}</span>
-          </Link>
-          <div className="flex items-center gap-3 text-sm">
-            <span className="hidden text-muted-foreground sm:inline">{ctx.barberName ?? ctx.email}</span>
-            <LogoutButton />
+        <div className="border-b border-gold/70 bg-gradient-to-b from-[hsl(30_17%_19%)] to-primary text-primary-foreground">
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+            <Link href={ctx.isBarber ? "/agenda" : "/admin"} className="flex min-w-0 items-center gap-2.5">
+              <Logo size={40} className="ring-1 ring-gold/70" />
+              <span className="truncate font-display text-xl font-extrabold uppercase tracking-wide">{ctx.shop.name}</span>
+            </Link>
+            <div className="flex items-center gap-3 text-sm">
+              <span className="hidden text-primary-foreground/70 sm:inline">{ctx.barberName ?? ctx.email}</span>
+              <LogoutButton />
+            </div>
           </div>
         </div>
         <StaffNav isAdmin={ctx.isAdmin} isBarber={ctx.isBarber} pendingRequests={pendingRequests} />

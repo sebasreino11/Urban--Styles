@@ -38,7 +38,7 @@ export default async function TeamPage() {
 
       <div className="grid gap-12 lg:grid-cols-[1fr_22rem]">
         <div>
-          <h2 className="mb-3 font-display text-2xl font-semibold text-primary">Barberos</h2>
+          <h2 className="mb-3 font-display text-2xl font-extrabold uppercase text-primary">Barberos</h2>
           <ul className="divide-y divide-border border-y border-border">
             {(barbers ?? []).map((b) => {
               const m = b.membership_id ? memberById.get(b.membership_id) : null;
@@ -64,7 +64,7 @@ export default async function TeamPage() {
 
           {accountsWithoutProfile.length > 0 && (
             <>
-              <h2 className="mb-3 mt-10 font-display text-2xl font-semibold text-primary">Cuentas sin perfil de barbero</h2>
+              <h2 className="mb-3 mt-10 font-display text-2xl font-extrabold uppercase text-primary">Cuentas sin perfil de barbero</h2>
               <ul className="divide-y divide-border border-y border-border text-sm">
                 {accountsWithoutProfile.map((m) => (
                   <li key={m.id} className="flex items-center justify-between py-3">

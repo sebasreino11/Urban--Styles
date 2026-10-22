@@ -5,7 +5,9 @@ import { loadAvailableSlots } from "@/app/(public)/actions";
 import { bookAsStaff } from "@/app/(staff)/actions";
 import type { PublicBarber, Service, Slot } from "@/lib/domain/types";
 import { formatCOP, formatDateTime, formatTime } from "@/lib/format";
+import { SkeletonRegion } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { SlotButtonsSkeleton } from "./skeletons";
 import { buttonClass, Field, inputClass } from "./ui";
 
 /**
@@ -109,7 +111,9 @@ export function StaffBookingForm({
         <div>
           <p className="mb-2 text-sm font-medium">Hora</p>
           {!slots ? (
-            <p className="text-sm text-muted-foreground">Buscando horarios…</p>
+            <SkeletonRegion label="Buscando horarios">
+              <SlotButtonsSkeleton />
+            </SkeletonRegion>
           ) : slots.length === 0 ? (
             <p className="text-sm text-muted-foreground">No hay horarios libres ese día.</p>
           ) : (

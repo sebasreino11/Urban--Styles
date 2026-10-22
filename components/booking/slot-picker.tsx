@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Skeleton, SkeletonRegion } from "@/components/ui/skeleton";
 import type { Slot } from "@/lib/domain/types";
 import { formatDate, formatTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -16,7 +17,19 @@ export function DayStrip({
   days: { day: string; slotCount: number }[] | null; selected: string | null; onSelect: (d: string) => void; timezone: string;
 }) {
   const [page, setPage] = useState(0);
-  if (!days) return <div className="h-[68px] animate-pulse rounded-lg bg-muted" />;
+  if (!days) {
+    return (
+      <SkeletonRegion label="Buscando días disponibles" className="flex items-center gap-1.5">
+        <Skeleton className="h-[68px] w-8 shrink-0 rounded-lg" />
+        <div className="grid flex-1 grid-cols-5 gap-1.5">
+          {Array.from({ length: DAYS_PER_PAGE }, (_, i) => (
+            <Skeleton key={i} className="h-[68px] rounded-lg" />
+          ))}
+        </div>
+        <Skeleton className="h-[68px] w-8 shrink-0 rounded-lg" />
+      </SkeletonRegion>
+    );
+  }
   if (days.length === 0) return null;
   const pages = Math.ceil(days.length / DAYS_PER_PAGE);
   const current = Math.min(page, pages - 1);
@@ -40,11 +53,11 @@ export function DayStrip({
                 onClick={() => onSelect(day)}
                 className={cn(
                   "flex h-[68px] w-full flex-col items-center justify-center rounded-lg border leading-tight transition-colors",
-                  isSel ? "border-primary bg-primary text-primary-foreground shadow-soft" : "border-border hover:border-gold",
+                  isSel ? "border-gold bg-primary text-primary-foreground shadow-soft" : "border-border hover:border-gold",
                 )}
               >
                 <span className="text-xs capitalize">{formatDate(iso, timezone, { weekday: "short", day: undefined, month: undefined }).replace(".", "")}</span>
-                <span className={cn("font-display text-2xl font-semibold", isSel && "text-gold-light")}>{Number(day.slice(8))}</span>
+                <span className={cn("font-display text-2xl font-extrabold", isSel && "text-gold-light")}>{Number(day.slice(8))}</span>
                 <span className="text-[11px] capitalize opacity-70">{formatDate(iso, timezone, { month: "short", weekday: undefined, day: undefined }).replace(".", "")}</span>
               </button>
             </li>
@@ -61,9 +74,18 @@ export function DayStrip({
 export function SlotGrid({ slots, timezone, onSelect }: { slots: Slot[] | null; timezone: string; onSelect: (s: Slot) => void }) {
   if (!slots) {
     return (
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Loader2 className="size-4 animate-spin" aria-hidden /> Buscando horarios
-      </div>
+      <SkeletonRegion label="Buscando horarios" className="grid gap-4">
+        {[6, 4].map((count, g) => (
+          <div key={g}>
+            <Skeleton className="mb-2 h-4 w-16" />
+            <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-4">
+              {Array.from({ length: count }, (_, i) => (
+                <Skeleton key={i} className="h-10 rounded-lg" />
+              ))}
+            </div>
+          </div>
+        ))}
+      </SkeletonRegion>
     );
   }
   if (slots.length === 0) return <p className="text-sm text-muted-foreground">Este día ya está lleno. Elige otro día.</p>;
@@ -87,7 +109,7 @@ export function SlotGrid({ slots, timezone, onSelect }: { slots: Slot[] | null; 
                 <button
                   type="button"
                   onClick={() => onSelect(s)}
-                  className="h-10 w-full rounded-lg border border-border text-sm font-medium tabular-nums transition-colors hover:border-primary hover:bg-primary hover:text-gold-light"
+                  className="h-10 w-full rounded-lg border border-border text-sm font-medium tabular-nums transition-colors hover:border-gold hover:bg-gold hover:text-primary"
                 >
                   {formatTime(s.startsAt, timezone)}
                 </button>
