@@ -59,7 +59,7 @@ export async function sendPush(
   const res = await fetch(hookUrl.replace(/\/+$/, ""), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ tags: "citas", color: "#16392E", ...payload }),
+    body: JSON.stringify({ tags: "citas", color: "#C4954F", ...payload }),
   });
   const text = await res.text();
   if (!res.ok || /"status"\s*:\s*"(?!ok)/.test(text)) {
