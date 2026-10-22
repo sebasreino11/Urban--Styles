@@ -15,7 +15,7 @@ export function CancelButton({ token }: { token: string }) {
       <button
         type="button"
         onClick={() => setConfirming(true)}
-        className="text-sm font-medium text-accent underline underline-offset-4"
+        className="text-sm font-medium text-destructive underline underline-offset-4"
       >
         Cancelar esta cita
       </button>
@@ -36,19 +36,19 @@ export function CancelButton({ token }: { token: string }) {
               else setError(r.message);
             })
           }
-          className="h-10 rounded-md bg-accent px-4 text-sm font-semibold text-accent-foreground disabled:opacity-50"
+          className="h-10 rounded-lg bg-destructive px-4 text-sm font-semibold text-destructive-foreground shadow-soft disabled:opacity-50"
         >
           {pending ? "Cancelando" : "Sí, cancelar la cita"}
         </button>
         <button
           type="button"
           onClick={() => setConfirming(false)}
-          className="h-10 rounded-md border border-border px-4 text-sm font-medium"
+          className="h-10 rounded-lg border border-input px-4 text-sm font-medium transition-colors hover:bg-secondary"
         >
           Conservar la cita
         </button>
       </div>
-      {error && <p role="alert" className="text-sm text-accent">{error}</p>}
+      {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
     </div>
   );
 }

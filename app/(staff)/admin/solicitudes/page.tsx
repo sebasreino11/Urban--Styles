@@ -39,7 +39,7 @@ export default async function RequestsPage() {
           {pending.map((r, idx) => (
             <li key={r.id} className="grid gap-4 rounded-lg border border-border bg-card p-5 lg:grid-cols-[1fr_22rem]">
               <div>
-                <p className="font-display text-2xl font-extrabold uppercase text-primary">{r.barber?.display_name}</p>
+                <p className="font-display text-2xl font-semibold text-primary">{r.barber?.display_name}</p>
                 <p className="mt-1 text-sm capitalize">
                   {formatDateTime(r.starts_at, tz)} → {formatDateTime(r.ends_at, tz)}
                 </p>
@@ -68,7 +68,7 @@ export default async function RequestsPage() {
         </ul>
       )}
 
-      <h2 className="mb-4 mt-14 font-display text-2xl font-extrabold uppercase text-primary">Historial</h2>
+      <h2 className="mb-4 mt-14 font-display text-2xl font-semibold text-primary">Historial</h2>
       <TimeOffList requests={history} timezone={tz} />
     </>
   );

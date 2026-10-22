@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Logo } from "@/components/brand";
 import { LogoutButton } from "@/components/logout-button";
 import { StaffNav } from "@/components/staff/staff-nav";
 import { requireStaff } from "@/lib/domain/staff";
@@ -26,8 +27,9 @@ export default async function StaffLayout({ children }: { children: React.ReactN
       <div className="barber-stripe h-1" aria-hidden />
       <header className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-          <Link href={ctx.isBarber ? "/agenda" : "/admin"} className="font-display text-xl font-extrabold uppercase tracking-wide text-primary">
-            {ctx.shop.name}
+          <Link href={ctx.isBarber ? "/agenda" : "/admin"} className="flex min-w-0 items-center gap-2.5">
+            <Logo size={36} />
+            <span className="truncate font-display text-xl font-bold tracking-wide text-primary">{ctx.shop.name}</span>
           </Link>
           <div className="flex items-center gap-3 text-sm">
             <span className="hidden text-muted-foreground sm:inline">{ctx.barberName ?? ctx.email}</span>

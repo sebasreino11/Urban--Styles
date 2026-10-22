@@ -7,11 +7,19 @@ import {
   createBooking,
   getAvailableDays,
   getAvailableSlots,
+  getRescheduleDays,
+  getRescheduleSlots,
+  rescheduleBookingByToken,
 } from "@/lib/domain/booking";
 import { DomainError, toActionError, type ActionResult } from "@/lib/domain/errors";
-import { notifyBookingCancelled, notifyBookingCreated } from "@/lib/domain/notifications";
+import {
+  notifyBookingCancelled,
+  notifyBookingCreated,
+  notifyBookingRescheduled,
+} from "@/lib/domain/notifications";
 import { resolveShop } from "@/lib/domain/shop";
-import type { Slot, TokenAppointment } from "@/lib/domain/types";
+import type { RescheduledAppointment, Slot, TokenAppointment } from "@/lib/domain/types";
+import { addDays, localDate } from "@/lib/format";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { bookingInputSchema } from "@/lib/validation/booking";
 
@@ -97,6 +105,42 @@ export async function submitBooking(
         manageToken: booking.cancel_token,
       },
     };
+  } catch (e) {
+    return toActionError(e);
+  }
+}
+
+export async function loadRescheduleDays(token: string): Promise<ActionResult<{ day: string; slotCount: number }[]>> {
+  try {
+    const shop = await currentShop();
+    const today = localDate(new Date(), shop.timezone);
+    const days = await getRescheduleDays(shop.id, token, {
+      from: today,
+      to: addDays(today, shop.booking_horizon_days),
+    });
+    return { ok: true, data: days };
+  } catch (e) {
+    return toActionError(e);
+  }
+}
+
+export async function loadRescheduleSlots(token: string, date: string): Promise<ActionResult<Slot[]>> {
+  try {
+    const shop = await currentShop();
+    return { ok: true, data: await getRescheduleSlots(shop.id, token, date) };
+  } catch (e) {
+    return toActionError(e);
+  }
+}
+
+export async function rescheduleBooking(
+  token: string,
+  startsAt: string,
+): Promise<ActionResult<RescheduledAppointment>> {
+  try {
+    const appt = await rescheduleBookingByToken(token, startsAt);
+    after(() => notifyBookingRescheduled(appt.appointment_id, appt.previous_starts_at, token));
+    return { ok: true, data: appt };
   } catch (e) {
     return toActionError(e);
   }

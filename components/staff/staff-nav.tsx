@@ -50,7 +50,7 @@ export function StaffNav({
             className={cn(
               "flex shrink-0 items-center gap-2 border-b-2 px-3 py-2.5 text-sm font-medium transition-colors",
               isActive(l.href)
-                ? "border-accent text-foreground"
+                ? "border-gold text-foreground"
                 : "border-transparent text-muted-foreground hover:text-foreground",
             )}
           >

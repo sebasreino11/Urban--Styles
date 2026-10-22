@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Logo } from "@/components/brand";
 import { getBookingByToken } from "@/lib/domain/booking";
 import { formatCOP, formatDate, formatTime } from "@/lib/format";
 import { CancelButton } from "./cancel-button";
+import { RescheduleButton } from "./reschedule-button";
 
 export const metadata: Metadata = {
   title: "Tu cita",
@@ -25,23 +27,24 @@ export default async function AppointmentPage({ params }: { params: Promise<{ to
     <main className="mx-auto flex min-h-svh max-w-lg flex-col justify-center px-4 py-12">
       {!appt ? (
         <div>
-          <h1 className="font-display text-5xl font-black uppercase text-primary">Enlace no válido</h1>
+          <Logo size={64} />
+          <h1 className="mt-6 font-display text-5xl font-bold text-primary">Enlace no válido</h1>
           <p className="mt-3 text-muted-foreground">
             No encontramos una cita con este enlace. Copia el enlace completo del correo de confirmación.
           </p>
-          <Link href="/" className="mt-6 inline-block font-medium text-primary underline underline-offset-4">
+          <Link href="/" className="mt-6 inline-block font-medium text-gold-ink underline underline-offset-4">
             Ir a la página de la barbería
           </Link>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-lg bg-card shadow-[0_18px_40px_-24px_hsl(var(--primary)/0.45)]">
+        <div className="overflow-hidden rounded-xl bg-card shadow-lift ring-1 ring-gold/30">
           <div className="barber-stripe h-2" aria-hidden />
           <div className="px-6 py-6">
             <p className="text-sm text-muted-foreground">
               {appt.shop_name} · {STATUS_LABEL[appt.status]}
             </p>
             <p
-              className={`mt-2 font-display text-6xl font-black uppercase leading-[0.9] text-primary ${appt.status === "cancelled" ? "line-through decoration-accent decoration-4" : ""}`}
+              className={`mt-2 font-display text-6xl font-bold leading-[0.9] text-primary ${appt.status === "cancelled" ? "line-through decoration-destructive decoration-4" : ""}`}
             >
               {formatTime(appt.starts_at, appt.timezone)}
             </p>
@@ -64,15 +67,20 @@ export default async function AppointmentPage({ params }: { params: Promise<{ to
 
             <div className="mt-8 border-t border-border pt-5">
               {appt.can_cancel ? (
-                <CancelButton token={token} />
+                <div className="grid gap-5">
+                  {appt.service_id && (
+                    <RescheduleButton token={token} timezone={appt.timezone} currentStartsAt={appt.starts_at} />
+                  )}
+                  <CancelButton token={token} />
+                </div>
               ) : appt.status === "confirmed" || appt.status === "pending" ? (
                 <p className="text-sm text-muted-foreground">
-                  Ya no es posible cancelar en línea (se permite hasta{" "}
+                  Ya no es posible cancelar ni reprogramar en línea (se permite hasta{" "}
                   {Math.round(appt.cancel_notice_min / 60)} h antes).
                   {appt.shop_phone && <> Llama al {appt.shop_phone}.</>}
                 </p>
               ) : (
-                <Link href="/#reservar" className="font-medium text-primary underline underline-offset-4">
+                <Link href="/#reservar" className="font-medium text-gold-ink underline underline-offset-4">
                   Reservar otra cita
                 </Link>
               )}

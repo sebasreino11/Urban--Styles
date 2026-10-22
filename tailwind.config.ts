@@ -9,7 +9,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ["var(--font-display)", "Impact", "sans-serif"],
+        display: ["var(--font-display)", "Georgia", "serif"],
         sans: ["var(--font-text)", "system-ui", "sans-serif"],
       },
       colors: {
@@ -48,6 +48,16 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
+        gold: {
+          DEFAULT: "hsl(var(--accent))",
+          light: "hsl(var(--gold-light))",
+          ink: "hsl(var(--gold-ink))",
+        },
+      },
+      boxShadow: {
+        // Sombras teñidas de tinta, no gris neutro.
+        soft: "0 1px 2px hsl(var(--primary) / 0.06), 0 4px 12px -4px hsl(var(--primary) / 0.12)",
+        lift: "0 1px 0 hsl(var(--border)), 0 24px 48px -24px hsl(var(--primary) / 0.4)",
       },
       borderRadius: {
         lg: "calc(var(--radius) + 4px)",

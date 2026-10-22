@@ -68,7 +68,7 @@ export default async function AgendaPage({ searchParams }: { searchParams: Promi
 
       {view === "todas" && history.length > 0 && (
         <div className="mt-14">
-          <h2 className="mb-4 font-display text-3xl font-black uppercase text-muted-foreground">Anteriores</h2>
+          <h2 className="mb-4 font-display text-3xl font-bold text-muted-foreground">Anteriores</h2>
           <AppointmentList appointments={history} timezone={tz} />
         </div>
       )}

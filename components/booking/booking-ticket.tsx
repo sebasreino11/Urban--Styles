@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
-import { Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 import {
   loadAvailableDays,
   loadAvailableSlots,
@@ -19,10 +19,10 @@ import {
   localDate,
 } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { DayStrip, SlotGrid } from "./slot-picker";
 import { Turnstile } from "./turnstile";
 
 const ANY = "any";
-const DAYS_PER_PAGE = 5;
 
 interface Props {
   services: Service[];
@@ -219,7 +219,7 @@ export function BookingTicket({ services, barbers, timezone, horizonDays, initia
             <button
               type="submit"
               disabled={submitting || !name || !email}
-              className="mt-1 inline-flex h-12 items-center justify-center gap-2 rounded-md bg-accent px-6 font-display text-xl font-extrabold uppercase tracking-wide text-accent-foreground transition-colors hover:bg-accent/90 disabled:opacity-50"
+              className="mt-1 inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-primary px-6 font-display text-xl font-semibold text-gold-light shadow-soft ring-1 ring-inset ring-gold/40 transition-colors hover:bg-primary/90 disabled:opacity-50"
             >
               {submitting && <Loader2 className="size-5 animate-spin" aria-hidden />}
               {submitting ? "Reservando" : "Reservar cita"}
@@ -228,7 +228,7 @@ export function BookingTicket({ services, barbers, timezone, horizonDays, initia
         </Step>
 
         {notice && (
-          <p role="alert" className="mx-5 mb-5 rounded-md border border-accent/30 bg-accent/5 px-3 py-2 text-sm text-accent">
+          <p role="alert" className="mx-5 mb-5 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
             {notice}
           </p>
         )}
@@ -240,14 +240,14 @@ export function BookingTicket({ services, barbers, timezone, horizonDays, initia
 /* --------------------------------------------------------------------------- */
 
 const inputClass =
-  "h-11 w-full rounded-md border border-input bg-card px-3 text-base outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary";
+  "h-11 w-full rounded-lg border border-input bg-card px-3 text-base outline-none transition-colors focus:border-gold-ink focus:ring-1 focus:ring-gold-ink";
 
 function TicketShell({ children }: { children: React.ReactNode }) {
   return (
-    <div id="reservar" className="relative scroll-mt-6 overflow-hidden rounded-lg bg-card text-card-foreground shadow-[0_1px_0_hsl(var(--border)),0_18px_40px_-24px_hsl(var(--primary)/0.45)]">
+    <div id="reservar" className="relative scroll-mt-6 overflow-hidden rounded-xl bg-card text-card-foreground shadow-lift ring-1 ring-gold/30">
       <div className="barber-stripe h-2" aria-hidden />
-      <div className="flex items-baseline justify-between px-5 pb-3 pt-4">
-        <h2 className="font-display text-3xl font-black uppercase leading-none text-primary">Tu turno</h2>
+      <div className="flex items-baseline justify-between gap-3 px-5 pb-3 pt-5">
+        <h2 className="font-display text-3xl font-bold leading-none text-primary">Tu turno</h2>
         <span className="text-xs text-muted-foreground">Sin registro · 1 minuto</span>
       </div>
       <div className="ticket-perforation h-3 border-t border-dashed border-border" aria-hidden />
@@ -269,8 +269,8 @@ function Step({
       <div className="flex items-center gap-3">
         <span
           className={cn(
-            "flex size-7 shrink-0 items-center justify-center rounded-full border font-display text-base font-extrabold",
-            done && !open ? "border-primary bg-primary text-primary-foreground" : open ? "border-primary text-primary" : "border-border text-muted-foreground",
+            "flex size-7 shrink-0 items-center justify-center rounded-full border font-display text-base font-bold",
+            done && !open ? "border-primary bg-primary text-gold-light" : open ? "border-primary text-primary" : "border-border text-muted-foreground",
           )}
           aria-hidden
         >
@@ -281,7 +281,7 @@ function Step({
           {done && !open && summary && <p className="truncate text-sm text-muted-foreground">{summary}</p>}
         </div>
         {done && !open && onEdit && (
-          <button type="button" onClick={onEdit} className="text-sm font-medium text-primary underline-offset-4 hover:underline">
+          <button type="button" onClick={onEdit} className="text-sm font-medium text-gold-ink underline-offset-4 hover:underline">
             Cambiar
           </button>
         )}
@@ -299,8 +299,8 @@ function Choice({ selected, onClick, children }: { selected: boolean; onClick: (
       aria-checked={selected}
       onClick={onClick}
       className={cn(
-        "flex min-h-12 w-full items-center gap-3 rounded-md border px-3 py-2 text-left transition-colors",
-        selected ? "border-primary bg-primary text-primary-foreground [&_.text-muted-foreground]:text-primary-foreground/70" : "border-border bg-background/40 hover:border-primary/50",
+        "flex min-h-12 w-full items-center gap-3 rounded-lg border px-3 py-2 text-left transition-colors",
+        selected ? "border-primary bg-primary text-primary-foreground shadow-soft [&_.text-muted-foreground]:text-primary-foreground/70" : "border-border bg-background/40 hover:border-gold",
       )}
     >
       {children}
@@ -311,99 +311,9 @@ function Choice({ selected, onClick, children }: { selected: boolean; onClick: (
 export function Monogram({ name, className }: { name: string; className?: string }) {
   const initials = name.split(/\s+/).map((p) => p[0]).slice(0, 2).join("");
   return (
-    <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary font-display text-sm font-extrabold uppercase text-primary", className)} aria-hidden>
+    <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-full bg-primary font-display text-sm font-semibold uppercase text-gold-light ring-1 ring-gold/60", className)} aria-hidden>
       {initials}
     </span>
-  );
-}
-
-function DayStrip({
-  days, selected, onSelect, timezone,
-}: {
-  days: { day: string; slotCount: number }[] | null; selected: string | null; onSelect: (d: string) => void; timezone: string;
-}) {
-  const [page, setPage] = useState(0);
-  if (!days) return <div className="h-[68px] animate-pulse rounded-md bg-muted" />;
-  if (days.length === 0) return null;
-  const pages = Math.ceil(days.length / DAYS_PER_PAGE);
-  const current = Math.min(page, pages - 1);
-  const visible = days.slice(current * DAYS_PER_PAGE, (current + 1) * DAYS_PER_PAGE);
-  const arrow = "flex h-[68px] w-8 shrink-0 items-center justify-center rounded-md border border-border transition-colors hover:border-primary/50 disabled:opacity-30 disabled:hover:border-border";
-  return (
-    <div className="flex items-center gap-1.5">
-      <button type="button" aria-label="Días anteriores" className={arrow} disabled={current === 0} onClick={() => setPage(current - 1)}>
-        <ChevronLeft className="size-4" aria-hidden />
-      </button>
-      <ul className="grid min-w-0 flex-1 grid-cols-5 gap-1.5" role="radiogroup" aria-label="Día">
-        {visible.map(({ day }) => {
-          const iso = `${day}T17:00:00Z`; // mediodía local en América: evita saltos de fecha
-          const isSel = selected === day;
-          return (
-            <li key={day}>
-              <button
-                type="button"
-                role="radio"
-                aria-checked={isSel}
-                onClick={() => onSelect(day)}
-                className={cn(
-                  "flex h-[68px] w-full flex-col items-center justify-center rounded-md border leading-tight transition-colors",
-                  isSel ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary/50",
-                )}
-              >
-                <span className="text-xs capitalize">{formatDate(iso, timezone, { weekday: "short", day: undefined, month: undefined }).replace(".", "")}</span>
-                <span className="font-display text-2xl font-extrabold">{Number(day.slice(8))}</span>
-                <span className="text-[11px] capitalize opacity-70">{formatDate(iso, timezone, { month: "short", weekday: undefined, day: undefined }).replace(".", "")}</span>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
-      <button type="button" aria-label="Días siguientes" className={arrow} disabled={current >= pages - 1} onClick={() => setPage(current + 1)}>
-        <ChevronRight className="size-4" aria-hidden />
-      </button>
-    </div>
-  );
-}
-
-function SlotGrid({ slots, timezone, onSelect }: { slots: Slot[] | null; timezone: string; onSelect: (s: Slot) => void }) {
-  if (!slots) {
-    return (
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Loader2 className="size-4 animate-spin" aria-hidden /> Buscando horarios
-      </div>
-    );
-  }
-  if (slots.length === 0) return <p className="text-sm text-muted-foreground">Este día ya está lleno. Elige otro día.</p>;
-
-  const hourOf = (s: Slot) =>
-    Number(new Intl.DateTimeFormat("en-US", { timeZone: timezone, hour: "numeric", hourCycle: "h23" }).format(new Date(s.startsAt)));
-  const groups = [
-    { label: "Mañana", items: slots.filter((s) => hourOf(s) < 12) },
-    { label: "Tarde", items: slots.filter((s) => hourOf(s) >= 12 && hourOf(s) < 17) },
-    { label: "Noche", items: slots.filter((s) => hourOf(s) >= 17) },
-  ].filter((g) => g.items.length);
-
-  return (
-    <div className="grid gap-4">
-      {groups.map((g) => (
-        <div key={g.label}>
-          <p className="mb-2 text-sm text-muted-foreground">{g.label}</p>
-          <ul className="grid grid-cols-3 gap-1.5 sm:grid-cols-4">
-            {g.items.map((s) => (
-              <li key={s.startsAt}>
-                <button
-                  type="button"
-                  onClick={() => onSelect(s)}
-                  className="h-10 w-full rounded-md border border-border text-sm font-medium tabular-nums transition-colors hover:border-primary hover:bg-primary hover:text-primary-foreground"
-                >
-                  {formatTime(s.startsAt, timezone)}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
   );
 }
 
@@ -421,7 +331,7 @@ function Confirmation({ c, timezone }: { c: BookingConfirmation; timezone: strin
   return (
     <TicketShell>
       <div className="px-5 py-6" role="status">
-        <p className="font-display text-5xl font-black uppercase leading-[0.9] text-primary">
+        <p className="font-display text-5xl font-bold leading-[0.9] text-primary">
           {formatTime(c.startsAt, timezone)}
         </p>
         <p className="mt-1 text-lg capitalize">{formatDate(c.startsAt, timezone)}</p>
@@ -436,8 +346,8 @@ function Confirmation({ c, timezone }: { c: BookingConfirmation; timezone: strin
         <p className="mt-5 text-sm text-muted-foreground">
           Te enviamos la confirmación a <span className="font-medium text-foreground">{c.email}</span>. Si no la ves, revisa la carpeta de spam.
         </p>
-        <Link href={`/cita/${c.manageToken}`} className="mt-4 inline-block text-sm font-medium text-primary underline underline-offset-4">
-          Ver o cancelar esta cita
+        <Link href={`/cita/${c.manageToken}`} className="mt-4 inline-block text-sm font-medium text-gold-ink underline underline-offset-4">
+          Ver, reprogramar o cancelar esta cita
         </Link>
       </div>
     </TicketShell>

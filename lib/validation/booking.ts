@@ -22,10 +22,12 @@ export const daysQuerySchema = z.object({
   to: isoDate,
 });
 
+export const startsAtSchema = z.iso.datetime({ offset: true, message: "Horario inválido" });
+
 export const bookingInputSchema = z.object({
   serviceId: uuid,
   barberId: uuid.nullable().default(null),
-  startsAt: z.iso.datetime({ offset: true, message: "Horario inválido" }),
+  startsAt: startsAtSchema,
   name: z
     .string()
     .trim()

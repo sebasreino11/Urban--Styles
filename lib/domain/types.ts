@@ -84,6 +84,8 @@ export interface TokenAppointment {
   status: AppointmentStatus;
   starts_at: string;
   ends_at: string;
+  service_id: string | null;
+  barber_id: string;
   service_name: string;
   price_cop: number;
   barber_name: string;
@@ -95,6 +97,10 @@ export interface TokenAppointment {
   timezone: string;
   can_cancel: boolean;
   cancel_notice_min: number;
+}
+
+export interface RescheduledAppointment extends TokenAppointment {
+  previous_starts_at: string;
 }
 
 export interface StaffAppointment {

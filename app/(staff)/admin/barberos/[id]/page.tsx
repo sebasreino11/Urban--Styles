@@ -42,7 +42,7 @@ export default async function BarberDetailPage({ params }: { params: Promise<{ i
       <div className="grid gap-14 lg:grid-cols-2">
         <div className="grid content-start gap-12">
           <section>
-            <h2 className="mb-4 font-display text-2xl font-extrabold uppercase text-primary">Perfil</h2>
+            <h2 className="mb-4 font-display text-2xl font-semibold text-primary">Perfil</h2>
             <BarberProfileForm
               barber={barber}
               services={(services ?? []) as Service[]}
@@ -50,7 +50,7 @@ export default async function BarberDetailPage({ params }: { params: Promise<{ i
             />
           </section>
           <section>
-            <h2 className="mb-4 font-display text-2xl font-extrabold uppercase text-primary">Acceso</h2>
+            <h2 className="mb-4 font-display text-2xl font-semibold text-primary">Acceso</h2>
             {membership ? (
               <MemberRolesForm membership={membership} isSelf={membership.user_id === ctx.userId} />
             ) : (
@@ -59,7 +59,7 @@ export default async function BarberDetailPage({ params }: { params: Promise<{ i
           </section>
         </div>
         <section>
-          <h2 className="font-display text-2xl font-extrabold uppercase text-primary">Horario de trabajo</h2>
+          <h2 className="font-display text-2xl font-semibold text-primary">Horario de trabajo</h2>
           <p className="mb-4 mt-1 text-sm text-muted-foreground">
             Solo se ofrecen horarios donde coinciden este horario y el de la barbería.
           </p>

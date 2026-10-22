@@ -36,7 +36,7 @@ export function AppointmentList({
         return (
           <section key={day}>
             <div className="mb-2 flex items-baseline justify-between border-b border-border pb-2">
-              <h2 className="font-display text-2xl font-extrabold uppercase text-primary">
+              <h2 className="font-display text-2xl font-semibold text-primary">
                 {formatDate(items[0].starts_at, timezone)}
               </h2>
               <p className="text-sm text-muted-foreground tabular-nums">

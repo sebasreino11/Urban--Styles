@@ -41,7 +41,7 @@ export function TimeOffForm({
 
   return (
     <form onSubmit={submit} className="grid gap-4 self-start rounded-lg border border-border bg-card p-5">
-      <h2 className="font-display text-2xl font-extrabold uppercase text-primary">
+      <h2 className="font-display text-2xl font-semibold text-primary">
         {autoApproved ? "Bloquear tiempo" : "Nueva solicitud"}
       </h2>
       <div className="grid grid-cols-2 gap-3">

@@ -1,5 +1,5 @@
 import "server-only";
-import { bookingConfirmationEmail } from "@/lib/email/templates";
+import { bookingConfirmationEmail, bookingRescheduledEmail } from "@/lib/email/templates";
 import { env } from "@/lib/env";
 import { formatDate, formatTime } from "@/lib/format";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -13,7 +13,7 @@ import type { Booking } from "./types";
  */
 
 type Channel = "email" | "push";
-type Event = "booking_created" | "booking_cancelled";
+type Event = "booking_created" | "booking_cancelled" | "booking_rescheduled";
 
 async function log(
   shopId: string,
@@ -142,6 +142,93 @@ export async function notifyBookingCreated(booking: Booking) {
   );
 
   await Promise.all(tasks);
+}
+
+/**
+ * Correo al cliente + push al barbero cuando el cliente reprograma desde el
+ * enlace. `token` es el del enlace (en la BD solo se guarda su hash).
+ */
+export async function notifyBookingRescheduled(appointmentId: string, previousStartsAt: string, token: string) {
+  try {
+    const site = env.siteUrl();
+    const { data: a } = await createAdminClient()
+      .from("appointments")
+      .select(
+        "barbershop_id, barber_id, starts_at, service_name, price_cop, barber:barbers(display_name), customer:customers(name, email), shop:barbershops(name, address, phone, timezone, cancel_notice_min)",
+      )
+      .eq("id", appointmentId)
+      .single();
+    if (!a) return;
+    const shop = a.shop as unknown as {
+      name: string;
+      address: string | null;
+      phone: string | null;
+      timezone: string;
+      cancel_notice_min: number;
+    };
+    const customer = a.customer as unknown as { name: string; email: string };
+    const barber = a.barber as unknown as { display_name: string };
+
+    const tasks: Promise<void>[] = [];
+
+    tasks.push(
+      (async () => {
+        try {
+          const msg = bookingRescheduledEmail({
+            shopName: shop.name,
+            shopAddress: shop.address,
+            shopPhone: shop.phone,
+            customerName: customer.name,
+            serviceName: a.service_name,
+            barberName: barber.display_name,
+            startsAt: a.starts_at,
+            previousStartsAt,
+            timezone: shop.timezone,
+            priceCop: a.price_cop,
+            manageUrl: `${site}/cita/${token}`,
+            cancelNoticeMin: shop.cancel_notice_min,
+          });
+          const r = await sendEmail(customer.email, msg);
+          await log(
+            a.barbershop_id,
+            appointmentId,
+            "email",
+            "booking_rescheduled",
+            r.ok ? "sent" : r.skipped ? "skipped" : "failed",
+            r.ok ? customer.email : r.detail,
+          );
+        } catch (e) {
+          await log(a.barbershop_id, appointmentId, "email", "booking_rescheduled", "failed", String(e));
+        }
+      })(),
+    );
+
+    tasks.push(
+      (async () => {
+        try {
+          const hookUrl = await getBarberHookUrl(a.barber_id);
+          if (!hookUrl) {
+            await log(a.barbershop_id, appointmentId, "push", "booking_rescheduled", "skipped", "Barbero sin URL de Hook.Notifier");
+            return;
+          }
+          const when = (iso: string) => `${formatDate(iso, shop.timezone)} · ${formatTime(iso, shop.timezone)}`;
+          const r = await sendPush(hookUrl, {
+            object: `Cita reprogramada · ${formatTime(a.starts_at, shop.timezone)}`,
+            body: `${customer.name} — ${a.service_name}\nAntes: ${when(previousStartsAt)}\nAhora: ${when(a.starts_at)}`,
+            priority: "normal",
+            redirectUrl: `${site}/agenda`,
+          });
+          await log(a.barbershop_id, appointmentId, "push", "booking_rescheduled", r.ok ? "sent" : "failed", r.ok ? undefined : r.detail);
+        } catch (e) {
+          await log(a.barbershop_id, appointmentId, "push", "booking_rescheduled", "failed", String(e));
+        }
+      })(),
+    );
+
+    await Promise.all(tasks);
+  } catch (e) {
+    console.error("notifyBookingRescheduled failed", e);
+  }
 }
 
 /** Push al barbero cuando el cliente cancela desde el enlace del correo. */

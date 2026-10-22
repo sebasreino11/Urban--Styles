@@ -212,3 +212,67 @@ describe("cancelación por token", () => {
     ).rejects.toThrow(/permission denied/);
   });
 });
+
+describe("reprogramación por token", () => {
+  const reschedule = (token: string, startsAt: string) =>
+    as(db, { role: "service_role" }, (tx) =>
+      tx.query<{ r: Record<string, string> }>(
+        "select public.reschedule_appointment_by_token($1, $2) as r",
+        [token, startsAt],
+      ),
+    );
+
+  it("mueve la misma cita: conserva id, estado, barbero y token", async () => {
+    const r = await book(bogota(TUESDAY, "10:00"), CAMILO);
+    const moved = (await reschedule(r.cancel_token, bogota(TUESDAY, "15:00"))).rows[0].r;
+
+    expect(moved.appointment_id).toBe(r.appointment_id);
+    expect(moved.status).toBe("confirmed");
+    expect(moved.barber_id).toBe(CAMILO);
+    expect(new Date(moved.starts_at).toISOString()).toBe(bogota(TUESDAY, "15:00"));
+    expect(new Date(moved.previous_starts_at).toISOString()).toBe(bogota(TUESDAY, "10:00"));
+
+    // El enlace original sigue funcionando y el horario viejo queda libre.
+    const again = await as(db, { role: "service_role" }, (tx) =>
+      tx.query<{ r: { starts_at: string } }>("select public.get_appointment_by_token($1) as r", [r.cancel_token]),
+    );
+    expect(new Date(again.rows[0].r.starts_at).toISOString()).toBe(bogota(TUESDAY, "15:00"));
+    expect((await slots(TUESDAY, CAMILO)).map((s) => s.at)).toContain(bogota(TUESDAY, "10:00"));
+  });
+
+  it("permite moverse a un horario que se solapa con el actual", async () => {
+    const r = await book(bogota(TUESDAY, "10:00"), CAMILO);
+    // Sin excluir la propia cita, 10:15 estaría ocupado por ella misma.
+    expect((await slots(TUESDAY, CAMILO)).map((s) => s.at)).not.toContain(bogota(TUESDAY, "10:15"));
+    const moved = (await reschedule(r.cancel_token, bogota(TUESDAY, "10:15"))).rows[0].r;
+    expect(new Date(moved.starts_at).toISOString()).toBe(bogota(TUESDAY, "10:15"));
+  });
+
+  it("rechaza horario ocupado, mismo horario, token falso y citas no reprogramables", async () => {
+    const a = await book(bogota(TUESDAY, "10:00"), CAMILO, "a@example.com");
+    await book(bogota(TUESDAY, "12:00"), CAMILO, "b@example.com");
+
+    await expect(reschedule(a.cancel_token, bogota(TUESDAY, "12:00"))).rejects.toThrow(/SLOT_UNAVAILABLE/);
+    await expect(reschedule(a.cancel_token, bogota(TUESDAY, "10:00"))).rejects.toThrow(/SAME_SLOT/);
+    await expect(reschedule("token-falso", bogota(TUESDAY, "15:00"))).rejects.toThrow(/APPOINTMENT_NOT_FOUND/);
+
+    await as(db, { role: "service_role" }, (tx) =>
+      tx.query("select public.cancel_appointment_by_token($1)", [a.cancel_token]),
+    );
+    await expect(reschedule(a.cancel_token, bogota(TUESDAY, "15:00"))).rejects.toThrow(/NOT_RESCHEDULABLE/);
+  });
+
+  it("no deja reprogramar dentro de la ventana de aviso", async () => {
+    const r = await book(bogota(TUESDAY, "10:00"), CAMILO);
+    await db.query("update public.appointments set starts_at = now() + interval '30 minutes', ends_at = now() + interval '75 minutes'");
+    await expect(reschedule(r.cancel_token, bogota(TUESDAY, "15:00"))).rejects.toThrow(/TOO_LATE_TO_RESCHEDULE/);
+  });
+
+  it("anon no puede reprogramar directamente", async () => {
+    await expect(
+      as(db, { role: "anon" }, (tx) =>
+        tx.query("select public.reschedule_appointment_by_token('x', now())"),
+      ),
+    ).rejects.toThrow(/permission denied/);
+  });
+});

@@ -42,7 +42,7 @@ export function InviteStaffForm() {
         });
       }}
     >
-      <h2 className="font-display text-2xl font-extrabold uppercase text-primary">Invitar al equipo</h2>
+      <h2 className="font-display text-2xl font-semibold text-primary">Invitar al equipo</h2>
       <Field label="Nombre"><input className={inputClass} value={displayName} onChange={(e) => setDisplayName(e.target.value)} required /></Field>
       <Field label="Correo"><input type="email" className={inputClass} value={email} onChange={(e) => setEmail(e.target.value)} required /></Field>
       <fieldset className="grid gap-2 text-sm">

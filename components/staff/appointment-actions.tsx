@@ -48,7 +48,7 @@ export function AppointmentActions({
             Conservar
           </button>
           <button
-            className={`${buttonClass.small} border-accent text-accent`}
+            className={`${buttonClass.small} border-destructive text-destructive`}
             onClick={() => act("cancelled")}
             disabled={pending}
           >

@@ -15,6 +15,9 @@ const STATUS: Partial<Record<keyof typeof ERROR_MESSAGES, number>> = {
   SLOT_TAKEN: 409,
   NOT_CANCELLABLE: 409,
   TOO_LATE_TO_CANCEL: 409,
+  NOT_RESCHEDULABLE: 409,
+  TOO_LATE_TO_RESCHEDULE: 409,
+  SAME_SLOT: 409,
 };
 
 export function apiError(e: unknown) {

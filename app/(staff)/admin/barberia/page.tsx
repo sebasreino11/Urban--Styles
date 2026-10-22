@@ -23,7 +23,7 @@ export default async function ShopSettingsPage() {
       <div className="grid gap-14 lg:grid-cols-[1.2fr_1fr]">
         <ShopProfileForm shop={shop} />
         <section>
-          <h2 className="font-display text-2xl font-extrabold uppercase text-primary">Horario de atención</h2>
+          <h2 className="font-display text-2xl font-semibold text-primary">Horario de atención</h2>
           <p className="mb-4 mt-1 text-sm text-muted-foreground">
             Nadie puede reservar fuera de este horario, aunque el barbero tenga turno.
           </p>
