@@ -24,7 +24,7 @@ export default async function ServicesPage() {
         title="Servicios"
         description="Lo que ven los clientes al reservar. La duración define cuánto tiempo bloquea cada cita en la agenda."
       />
-      <div className="grid gap-3">
+      <div className="grid grid-cols-1 gap-3">
         {services.map((s) => (
           <ServiceEditor key={s.id} service={s} />
         ))}

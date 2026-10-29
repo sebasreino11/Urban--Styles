@@ -132,7 +132,7 @@ export default async function ShopPage({
                   Precios en pesos colombianos. Elige un servicio para ver los horarios disponibles.
                 </p>
               </div>
-              <ul className="grid gap-1">
+              <ul className="grid min-w-0 gap-1">
                 {services.map((s) => (
                   <li key={s.id}>
                     <Link
@@ -140,9 +140,9 @@ export default async function ShopPage({
                       className="group -mx-3 block rounded-lg px-3 py-3 transition-colors hover:bg-primary-foreground/[0.06]"
                     >
                       <div className="flex items-baseline gap-3">
-                        <span className="font-display text-2xl font-extrabold uppercase tracking-wide sm:text-3xl">{s.name}</span>
+                        <span className="min-w-0 font-display text-2xl font-extrabold uppercase tracking-wide [overflow-wrap:anywhere] sm:text-3xl">{s.name}</span>
                         <span className="leader h-4 min-w-6 flex-1" aria-hidden />
-                        <span className="font-display text-2xl font-extrabold tabular-nums text-gold-light sm:text-3xl">{formatCOP(s.price_cop)}</span>
+                        <span className="shrink-0 whitespace-nowrap font-display text-2xl font-extrabold tabular-nums text-gold-light sm:text-3xl">{formatCOP(s.price_cop)}</span>
                       </div>
                       <p className="mt-0.5 text-sm text-primary-foreground/70">
                         {formatDuration(s.duration_min)}

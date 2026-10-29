@@ -36,7 +36,7 @@ export default async function TeamPage() {
     <>
       <PageHeader title="Equipo" description="Barberos, sus cuentas de acceso y sus roles. Una persona tiene una sola cuenta aunque sea barbero y administrador." />
 
-      <div className="grid gap-12 lg:grid-cols-[1fr_22rem]">
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <div>
           <h2 className="mb-3 font-display text-2xl font-extrabold uppercase text-primary">Barberos</h2>
           <ul className="divide-y divide-border border-y border-border">
@@ -55,7 +55,7 @@ export default async function TeamPage() {
                         {m ? `${m.email ?? "Cuenta"} · ${(m.roles as AppRole[]).map((r) => ROLE_LABEL[r]).join(" y ")}` : "Sin cuenta de acceso"}
                       </p>
                     </div>
-                    <span className="text-sm text-muted-foreground">{b.active ? "Visible" : "Oculto"}</span>
+                    <span className="shrink-0 text-sm text-muted-foreground">{b.active ? "Visible" : "Oculto"}</span>
                   </Link>
                 </li>
               );
@@ -67,9 +67,9 @@ export default async function TeamPage() {
               <h2 className="mb-3 mt-10 font-display text-2xl font-extrabold uppercase text-primary">Cuentas sin perfil de barbero</h2>
               <ul className="divide-y divide-border border-y border-border text-sm">
                 {accountsWithoutProfile.map((m) => (
-                  <li key={m.id} className="flex items-center justify-between py-3">
-                    <span>{m.email}</span>
-                    <span className="text-muted-foreground">
+                  <li key={m.id} className="flex items-center justify-between gap-3 py-3">
+                    <span className="min-w-0 truncate">{m.email}</span>
+                    <span className="shrink-0 text-muted-foreground">
                       {(m.roles as AppRole[]).map((r) => ROLE_LABEL[r]).join(" y ")}
                       {!m.active && " · Desactivada"}
                     </span>

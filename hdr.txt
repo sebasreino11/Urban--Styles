@@ -1,0 +1,16 @@
+HTTP/2 200 
+date: Sun, 25 Oct 2026 00:50:51 GMT
+content-type: text/html; charset=utf-8
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+link: </_next/static/media/55cb69ad17a100ed.p.2l41_ldkjomdb.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2", </_next/static/media/8a4bb24664ac8500-s.p.2_7gz-nbwppeo.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2"
+vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+permissions-policy: camera=(), microphone=(), geolocation=()
+referrer-policy: same-origin
+x-content-type-options: nosniff
+x-frame-options: DENY
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=Tm9K6Bpodv0Tl4gEWqXobZfSCgkizyA5qgPQwmHB6LfkzqhtmjxJY3qjKYvNi%2Bq9SilcmBN1NfguOn%2BMIbRWREzUaJ8MPCxeNE%2BrmT6JY3BbCJxraQIVCB5kQxFG04p7ewvWYsqIhr9c1OKSFg%3D%3D"}]}
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+server: cloudflare
+cf-ray: a4fd3ac17ce55d37-MIA
+alt-svc: h3=":443"; ma=86400
+
