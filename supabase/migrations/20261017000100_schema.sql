@@ -4,7 +4,7 @@
 -- Toda tabla de negocio lleva `barbershop_id`. Las FKs compuestas
 -- (id, barbershop_id) garantizan que nunca se mezclen filas de dos barberías
 -- (p. ej. una cita de la barbería A con un barbero de la barbería B).
--- Si agregas una tabla aquí, documéntala en README › Modelo de datos.
+-- Si agregas una tabla aquí, documéntala en docs/arquitectura.md › Modelo de datos.
 -- =============================================================================
 
 create extension if not exists btree_gist with schema extensions;

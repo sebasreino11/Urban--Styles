@@ -2,7 +2,7 @@
 -- Lógica de negocio en la base de datos (fuente única de verdad).
 --
 -- El portal web, la API /api/v1 y el futuro bot de WhatsApp llaman estas
--- mismas funciones vía lib/domain/*. Documentadas en README › Reglas de negocio.
+-- mismas funciones vía lib/domain/*. Documentadas en docs/arquitectura.md › Reglas de negocio.
 --
 -- Errores de negocio: `raise exception '<CODIGO>' using errcode = 'P0001'`.
 -- lib/domain/errors.ts traduce cada código a un mensaje para el usuario.

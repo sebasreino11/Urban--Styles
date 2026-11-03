@@ -5,7 +5,7 @@
 -- public: sin GRANT, el rol obtiene `permission denied` aunque exista una
 -- política RLS. RLS decide QUÉ FILAS; los GRANT deciden QUÉ OPERACIONES.
 -- Ambos deben permitir el acceso. Mantener sincronizado con 000300_rls.sql
--- y con README › Políticas RLS.
+-- y con docs/arquitectura.md › Políticas RLS.
 -- =============================================================================
 
 -- Limpieza: nada por defecto para roles de API.

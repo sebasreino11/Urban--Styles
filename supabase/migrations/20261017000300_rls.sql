@@ -8,7 +8,7 @@
 --   service_role  → servidor (Workers) con la secret key; ignora RLS y solo
 --                   se usa para operaciones públicas ya validadas (reservar,
 --                   cancelar por token) y para enviar notificaciones.
--- Cualquier cambio aquí debe reflejarse en README › Políticas RLS.
+-- Cualquier cambio aquí debe reflejarse en docs/arquitectura.md › Políticas RLS.
 -- =============================================================================
 
 alter table public.barbershops       enable row level security;
